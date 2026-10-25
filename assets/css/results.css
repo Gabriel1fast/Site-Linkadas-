@@ -1,0 +1,330 @@
+/* Resultados — segunda dobra (track record) */
+.results {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: clamp(96px, 12vw, 168px) 0 clamp(96px, 11vw, 152px);
+  background: var(--color-bg);
+}
+
+/* Transição da Hero: filete luminoso + halo descendo da junção entre as seções */
+.results::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: min(880px, 90%);
+  height: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, rgba(139,42,194,.7) 30%, var(--color-magenta) 50%, rgba(139,42,194,.7) 70%, transparent);
+  box-shadow: 0 0 24px rgba(197,26,216,.55);
+}
+.results__ambient {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 38% 22% at 50% 0%, rgba(197,26,216,.14), transparent 70%),
+    radial-gradient(ellipse 40% 45% at 76% 52%, rgba(139,42,194,.2), transparent 70%),
+    radial-gradient(ellipse 30% 35% at 12% 80%, rgba(24,7,43,.9), transparent 70%);
+}
+
+.results__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+  align-items: center;
+  gap: clamp(48px, 6vw, 96px);
+}
+
+/* ---------- Conteúdo ---------- */
+.results__content { max-width: 540px; }
+
+.results__title {
+  margin: var(--space-8) 0 0;
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -.05em;
+  text-wrap: balance;
+}
+.results__title .grad-text { display: inline-block; padding-right: .04em; }
+
+.results__lead {
+  max-width: 440px;
+  margin: var(--space-6) 0 0;
+  color: var(--color-muted);
+  font-size: clamp(15px, 1.2vw, 17px);
+  line-height: 1.7;
+}
+
+.results__actions { margin-top: var(--space-12); }
+
+/* ---------- Composição visual ---------- */
+.results__visual {
+  --px: 0;
+  --py: 0;
+  position: relative;
+  min-height: 660px;
+}
+
+/* Palco principal (container 4:5) */
+.results__stage {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  width: 76%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 100%, rgba(197,26,216,.35), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 30%, rgba(139,42,194,.25), transparent 70%),
+    var(--color-surface);
+  box-shadow: var(--shadow-lg), 0 0 80px rgba(139,42,194,.18);
+}
+.results__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1400ms cubic-bezier(.2,.7,.2,1);
+}
+.results__stage.is-ready .results__canvas { opacity: 1; }
+
+/* Luz e textura sobre o 3D (somam luz, não escurecem) */
+.results__stage-light {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    linear-gradient(160deg, rgba(245,239,232,.07), transparent 28%),
+    radial-gradient(ellipse 65% 30% at 50% 108%, rgba(197,26,216,.4), transparent 70%);
+}
+.results__stage-light::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 30%, #000 100%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 30%, #000 100%);
+}
+
+/* Marcas de canto — acabamento técnico */
+.results__corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 0 solid rgba(197,26,216,.75);
+  pointer-events: none;
+}
+.results__corner--tl { top: 12px; left: 12px; border-top-width: 1px; border-left-width: 1px; }
+.results__corner--tr { top: 12px; right: 12px; border-top-width: 1px; border-right-width: 1px; }
+.results__corner--bl { bottom: 12px; left: 12px; border-bottom-width: 1px; border-left-width: 1px; }
+.results__corner--br { bottom: 12px; right: 12px; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* Placa fantasma atrás do palco — segunda camada de profundidade */
+.results__ghost {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  width: 76%;
+  aspect-ratio: 4 / 5;
+  border: 1px solid var(--color-border-accent);
+  background: linear-gradient(160deg, rgba(139,42,194,.12), rgba(24,7,43,.05));
+  transform: translate(calc(var(--px) * -6px + 22px), calc(var(--py) * -6px - 18px)) rotate(4deg);
+  transform-origin: 50% 50%;
+  transition: transform 600ms cubic-bezier(.2,.7,.2,1);
+}
+
+/* Camadas com paralaxe (profundidade definida em data-depth) */
+[data-depth] {
+  transition: transform 600ms cubic-bezier(.2,.7,.2,1);
+}
+.results__stage { transform: translate(calc(var(--px) * 6px), calc(var(--py) * 6px)); }
+
+/* ---------- Seletores de case (flutuantes, à direita) ---------- */
+.case-tabs {
+  position: absolute;
+  top: 0;
+  right: -64px;
+  z-index: 2;
+  display: grid;
+  gap: var(--space-2);
+  width: 196px;
+  transform: translate(calc(var(--px) * 14px), calc(var(--py) * 14px));
+}
+.case-tabs > * { animation: float 7s ease-in-out infinite; }
+.case-tabs > :nth-child(2) { animation-delay: -1.5s; }
+.case-tabs > :nth-child(3) { animation-delay: -3s; }
+.case-tabs > :nth-child(4) { animation-delay: -4.5s; }
+.case-tabs:hover > *, .case-tabs:focus-within > * { animation-play-state: paused; }
+
+.case-chip {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 14px 11px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  background: rgba(9,5,14,.72);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--ease-normal), background var(--ease-normal), box-shadow var(--ease-normal), margin var(--ease-normal);
+}
+.case-chip:hover { border-color: var(--color-border-accent); }
+.case-chip.is-active {
+  margin-left: -20px;
+  border-color: var(--color-border-accent);
+  background: rgba(24,7,43,.82);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+.case-chip__index {
+  color: var(--color-faint);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: color var(--ease-normal);
+}
+.case-chip.is-active .case-chip__index { color: #E388EF; }
+.case-chip__value {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+}
+.case-chip__progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--brand-gradient);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.case-chip.is-active .case-chip__progress { animation: case-progress var(--case-duration, 6.5s) linear forwards; }
+[data-cases].is-paused .case-chip.is-active .case-chip__progress { animation-play-state: paused; }
+
+/* ---------- Cartão de detalhe (flutuante, à esquerda) ---------- */
+.case-card {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  display: grid;
+  width: min(380px, 70%);
+  padding: var(--space-6) var(--space-6) 26px;
+  border: 1px solid var(--color-border);
+  background: rgba(9,5,14,.78);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(197,26,216,.12);
+  transform: translate(calc(var(--px) * 22px), calc(var(--py) * 22px));
+}
+.case-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px -1px auto;
+  height: 2px;
+  background: var(--brand-gradient);
+}
+
+/* Painéis empilhados na mesma célula: a altura do cartão não salta */
+.case-card__panel {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 200ms ease, transform 200ms ease, visibility 0s linear 200ms;
+}
+.case-card__panel.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 450ms ease 220ms, transform 450ms cubic-bezier(.2,.7,.2,1) 220ms, visibility 0s linear 0s;
+}
+.case-card__label {
+  margin: 0;
+  color: #D991E7;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.case-card__value {
+  margin: var(--space-3) 0 0;
+  font-size: clamp(34px, 3.4vw, 46px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -.055em;
+  width: fit-content;
+  padding-right: .05em;
+}
+.case-card__headline {
+  margin: var(--space-3) 0 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.45;
+}
+.case-card__text {
+  margin: var(--space-2) 0 0;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+@keyframes float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -6px; }
+}
+@keyframes case-progress {
+  to { transform: scaleX(1); }
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 1100px) {
+  .case-tabs { right: -12px; width: 180px; }
+}
+
+@media (max-width: 900px) {
+  .results__inner { grid-template-columns: 1fr; }
+  .results__content { max-width: 640px; }
+  .results__visual {
+    display: grid;
+    min-height: 0;
+    max-width: 560px;
+    width: 100%;
+    margin-inline: auto;
+  }
+  .results__stage, .results__ghost { position: relative; top: auto; width: 100%; grid-area: 1 / 1; }
+  .results__ghost { transform: translate(14px, -12px) rotate(3deg); }
+  .results__stage { transform: none; }
+  .case-tabs {
+    position: relative;
+    top: auto;
+    right: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: auto;
+    margin: -64px 12px 0;
+    transform: none;
+  }
+  .case-tabs > * { animation: none; }
+  .case-chip.is-active { margin-left: 0; }
+  .case-card { position: relative; width: auto; margin-top: var(--space-3); transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .case-tabs > * { animation: none; }
+  .case-chip.is-active .case-chip__progress { animation: none; transform: scaleX(1); }
+}

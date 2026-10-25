@@ -138,3 +138,39 @@
   .navbar__logo { height: 28px; }
   .navbar__links, .navbar__actions .btn { display: none; }
 }
+
+/* ---------- Badge (Design System) ---------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 11px;
+  border: 1px solid var(--color-border);
+  font: 700 10px/1.2 var(--font);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.badge-brand { background: rgba(197,26,216,.12); border-color: var(--color-border-accent); color: #E388EF; }
+.badge-muted { color: var(--color-muted); }
+.badge-dot::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-magenta);
+  box-shadow: 0 0 12px var(--color-magenta);
+}
+
+/* ---------- Revelação ao rolar ---------- */
+.reveal-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(6px);
+  transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1), filter 900ms cubic-bezier(.2,.7,.2,1);
+  transition-delay: calc(var(--reveal-order, 0) * 110ms);
+}
+.reveal-scroll.is-in { opacity: 1; transform: none; filter: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-scroll { opacity: 1; transform: none; filter: none; }
+}

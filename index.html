@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/components.css">
   <link rel="stylesheet" href="assets/css/hero.css">
+  <link rel="stylesheet" href="assets/css/results.css">
 
   <script type="importmap">
     {
@@ -75,9 +76,99 @@
         </div>
       </div>
     </section>
+
+    <!-- Resultados (track record) -->
+    <section class="results" id="resultados" aria-labelledby="results-title">
+      <div class="results__ambient" aria-hidden="true"></div>
+
+      <div class="container results__inner">
+        <div class="results__content">
+          <span class="badge badge-brand badge-dot reveal-scroll" style="--reveal-order:0">Our Track Record</span>
+
+          <h2 class="results__title reveal-scroll" id="results-title" style="--reveal-order:1">
+            Resultados que <span class="grad-text">dispensam adjetivos.</span>
+          </h2>
+
+          <p class="results__lead reveal-scroll" style="--reveal-order:2">
+            Estratégia se valida na execução. Conheça parte da experiência que sustenta nossa atuação.
+          </p>
+
+          <div class="results__actions reveal-scroll" style="--reveal-order:3">
+            <a class="btn btn-primary btn-lg" href="#diagnostico" data-cta>
+              Solicitar diagnóstico estratégico <span class="btn__icon" aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="results__visual reveal-scroll" style="--reveal-order:1" data-cases>
+          <div class="results__ghost" aria-hidden="true"></div>
+
+          <div class="results__stage" data-depth="0.4" data-results-visual aria-hidden="true">
+            <canvas class="results__canvas" data-results-canvas></canvas>
+            <div class="results__stage-light"></div>
+            <span class="results__corner results__corner--tl"></span>
+            <span class="results__corner results__corner--tr"></span>
+            <span class="results__corner results__corner--bl"></span>
+            <span class="results__corner results__corner--br"></span>
+          </div>
+
+          <div class="case-tabs" role="tablist" aria-label="Cases" data-depth="1.1">
+            <button class="case-chip is-active" type="button" role="tab" id="case-tab-1" aria-controls="case-panel-1" aria-selected="true" data-case-tab>
+              <span class="case-chip__index">Case 01</span>
+              <span class="case-chip__value">+R$ 600 MIL</span>
+              <span class="case-chip__progress" aria-hidden="true"></span>
+            </button>
+            <button class="case-chip" type="button" role="tab" id="case-tab-2" aria-controls="case-panel-2" aria-selected="false" tabindex="-1" data-case-tab>
+              <span class="case-chip__index">Case 02</span>
+              <span class="case-chip__value">+1 MILHÃO</span>
+              <span class="case-chip__progress" aria-hidden="true"></span>
+            </button>
+            <button class="case-chip" type="button" role="tab" id="case-tab-3" aria-controls="case-panel-3" aria-selected="false" tabindex="-1" data-case-tab>
+              <span class="case-chip__index">Case 03</span>
+              <span class="case-chip__value">+60 UNIDADES</span>
+              <span class="case-chip__progress" aria-hidden="true"></span>
+            </button>
+            <button class="case-chip" type="button" role="tab" id="case-tab-4" aria-controls="case-panel-4" aria-selected="false" tabindex="-1" data-case-tab>
+              <span class="case-chip__index">Case 04</span>
+              <span class="case-chip__value">7 DIAS</span>
+              <span class="case-chip__progress" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <div class="case-card" data-depth="1.6">
+            <article class="case-card__panel is-active" role="tabpanel" id="case-panel-1" aria-labelledby="case-tab-1" data-case-panel>
+              <h3 class="case-card__label">Case 01 — Growth &amp; Lançamento</h3>
+              <p class="case-card__value grad-text">+R$ 600 MIL</p>
+              <p class="case-card__headline">Faturamento em um lançamento 100% orgânico.</p>
+              <p class="case-card__text">Estratégia comercial estruturada por meio de um grupo VIP, com foco em geração de demanda e conversão, sem investimento em mídia paga.</p>
+            </article>
+            <article class="case-card__panel" role="tabpanel" id="case-panel-2" aria-labelledby="case-tab-2" data-case-panel inert>
+              <h3 class="case-card__label">Case 02 — Organic Performance</h3>
+              <p class="case-card__value grad-text">+1 MILHÃO</p>
+              <p class="case-card__headline">De visualizações em um único conteúdo.</p>
+              <p class="case-card__text">Produção audiovisual orientada por estratégia, com resultados de alcance orgânico que ultrapassaram 400 mil visualizações em outros conteúdos.</p>
+            </article>
+            <article class="case-card__panel" role="tabpanel" id="case-panel-3" aria-labelledby="case-tab-3" data-case-panel inert>
+              <h3 class="case-card__label">Case 03 — Business Expansion</h3>
+              <p class="case-card__value grad-text">+60 UNIDADES</p>
+              <p class="case-card__headline">Experiência em implantação de operações.</p>
+              <p class="case-card__text">Atuação da nossa fundadora na expansão da Action 360, com mais de 60 unidades implantadas. Expertise que fundamenta nossos projetos de estruturação comercial.</p>
+            </article>
+            <article class="case-card__panel" role="tabpanel" id="case-panel-4" aria-labelledby="case-tab-4" data-case-panel inert>
+              <h3 class="case-card__label">Case 04 — International Experience</h3>
+              <p class="case-card__value grad-text">7 DIAS</p>
+              <p class="case-card__headline">De cobertura audiovisual em Estocolmo.</p>
+              <p class="case-card__text">Produção e operação presencial durante um evento internacional na Suécia, demonstrando nossa capacidade de execução além das fronteiras brasileiras.</p>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/results.js" defer></script>
   <script type="module" src="assets/js/hero-ribbon.js"></script>
+  <script type="module" src="assets/js/results-visual.js"></script>
 </body>
 </html>
