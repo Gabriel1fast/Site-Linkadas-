@@ -1,0 +1,140 @@
+/* Componentes reutilizáveis — baseados nas especificações do Design System */
+
+/* ---------- Botões ---------- */
+.btn {
+  --btn-pad-y: 12px;
+  --btn-pad-x: 21px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 43px;
+  padding: var(--btn-pad-y) var(--btn-pad-x);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sharp);
+  background: transparent;
+  color: var(--color-text);
+  font: 700 var(--text-xs)/1 var(--font);
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  transition: background var(--ease-fast), border-color var(--ease-fast), box-shadow var(--ease-normal), transform var(--ease-normal);
+}
+.btn:hover { border-color: var(--color-magenta); box-shadow: var(--shadow-glow); }
+.btn:active { transform: translateY(1px); }
+
+.btn-primary { border-color: transparent; background: var(--color-magenta); color: #fff; }
+.btn-primary:hover { background: #D83AE7; }
+
+/* Brilho que atravessa o botão no hover */
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent 30%, rgba(245,239,232,.32) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 700ms cubic-bezier(.2,.7,.2,1);
+}
+.btn-primary:hover::after { transform: translateX(120%); }
+
+.btn-soft { background: rgba(197,26,216,.1); border-color: rgba(197,26,216,.35); }
+
+.btn-lg { --btn-pad-y: 18px; --btn-pad-x: 30px; min-height: 56px; font-size: var(--text-sm); }
+.btn-sm { --btn-pad-y: 10px; --btn-pad-x: 16px; min-height: 38px; font-size: 10px; }
+
+.btn__icon {
+  display: inline-block;
+  font-size: 1.15em;
+  line-height: 1;
+  transition: transform var(--ease-normal);
+}
+.btn:hover .btn__icon { transform: translate(2px, -2px); }
+
+/* ---------- Badge dividido (chip + rótulo) ---------- */
+.badge-split {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--color-border);
+  background: rgba(9,5,14,.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font: 700 10px/1 var(--font);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  transition: border-color var(--ease-normal), box-shadow var(--ease-normal);
+}
+.badge-split:hover { border-color: var(--color-border-accent); box-shadow: var(--shadow-glow); }
+.badge-split__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px 11px;
+  background: rgba(197,26,216,.12);
+  border-right: 1px solid var(--color-border-accent);
+  color: #E388EF;
+}
+.badge-split__chip::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-magenta);
+  box-shadow: 0 0 12px var(--color-magenta);
+}
+.badge-split__label {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 13px;
+  color: var(--color-muted);
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 60;
+  border-bottom: 1px solid transparent;
+  transition: background var(--ease-normal), border-color var(--ease-normal), backdrop-filter var(--ease-normal);
+}
+.navbar.is-scrolled {
+  background: rgba(0,0,0,.72);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border-bottom-color: var(--color-border);
+}
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: 76px;
+}
+.navbar__brand { display: inline-flex; align-items: center; flex-shrink: 0; }
+.navbar__logo { width: auto; height: 34px; }
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.navbar__links:empty { display: none; }
+.navbar__links a {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  transition: color var(--ease-fast);
+}
+.navbar__links a:hover { color: var(--color-text); }
+.navbar__actions { margin-left: auto; display: flex; align-items: center; gap: var(--space-4); }
+
+@media (max-width: 650px) {
+  .navbar__inner { height: 64px; }
+  .navbar__logo { height: 28px; }
+  .navbar__links, .navbar__actions .btn { display: none; }
+}

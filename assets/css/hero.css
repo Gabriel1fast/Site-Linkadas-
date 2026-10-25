@@ -1,0 +1,139 @@
+/* Hero — primeira dobra */
+.hero {
+  position: relative;
+  min-height: max(100svh, 860px);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Luz ambiente: halo superior central + gradiente ambiente oficial */
+.hero__ambient {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 46% 32% at 50% -4%, rgba(139,42,194,.34), transparent 70%),
+    radial-gradient(ellipse 30% 18% at 50% 0%, rgba(197,26,216,.18), transparent 70%),
+    var(--ambient-gradient);
+}
+
+/* Grade técnica sutil do Design System */
+.hero__grid {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 30%, #000 10%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 30%, #000 10%, transparent 75%);
+}
+
+/* Palco do elemento 3D */
+.hero__visual {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.hero__canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1600ms cubic-bezier(.2,.7,.2,1);
+}
+.hero__visual.is-ready .hero__canvas { opacity: 1; }
+
+/* Fallback sem WebGL: luz fluida em CSS com as cores da marca */
+.hero__fallback {
+  position: absolute;
+  inset: 45% -10% -10%;
+  opacity: 0;
+  background:
+    radial-gradient(ellipse 40% 28% at 28% 60%, rgba(197,26,216,.45), transparent 70%),
+    radial-gradient(ellipse 45% 22% at 70% 48%, rgba(139,42,194,.5), transparent 70%),
+    radial-gradient(ellipse 60% 35% at 50% 80%, rgba(24,7,43,.9), transparent 70%);
+  filter: blur(8px);
+  transition: opacity 1200ms ease;
+}
+.hero__visual.is-fallback .hero__fallback { opacity: 1; }
+
+/* Véu para manter a leitura do conteúdo e fundir com a próxima seção */
+.hero__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, #000 0%, rgba(0,0,0,.6) 30%, transparent 52%),
+    linear-gradient(to top, #000 0%, transparent 16%);
+}
+
+/* Conteúdo */
+.hero__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: clamp(136px, 17vh, 176px);
+  padding-bottom: var(--space-16);
+}
+
+.hero__title {
+  max-width: 15em;
+  margin: var(--space-8) 0 0;
+  font-size: clamp(38px, 4.6vw, 68px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -.045em;
+  text-wrap: balance;
+}
+.hero__title .grad-text { padding-right: .04em; }
+
+.hero__lead {
+  max-width: 600px;
+  margin: var(--space-6) 0 0;
+  color: var(--color-muted);
+  font-size: clamp(15px, 1.25vw, 17px);
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  margin-top: var(--space-12);
+}
+
+/* Entrada escalonada */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(6px);
+  transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1), filter 900ms cubic-bezier(.2,.7,.2,1);
+  transition-delay: calc(var(--reveal-order, 0) * 110ms + 120ms);
+}
+.is-loaded .reveal { opacity: 1; transform: none; filter: none; }
+
+@media (max-width: 650px) {
+  .hero { min-height: max(100svh, 720px); }
+  .hero__content { padding-top: 120px; }
+  .hero__title { letter-spacing: -.05em; }
+  .hero__actions { width: 100%; }
+  .hero__actions .btn { --btn-pad-x: 16px; width: 100%; font-size: var(--text-xs); letter-spacing: .06em; }
+  .badge-split { font-size: 9px; letter-spacing: .1em; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; filter: none; }
+  .hero__canvas { transition: none; }
+}

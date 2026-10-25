@@ -1,0 +1,56 @@
+/* Linkadas — Design tokens (fonte: Design System Linkadas v1.0)
+   Cores e fonte são oficiais da marca; medidas e efeitos são as propostas documentadas. */
+:root {
+  --color-bg: #000000;
+  --color-surface: #09050e;
+  --color-surface-2: #11091a;
+  --color-surface-3: #1a1026;
+  --color-purple-deep: #18072B;
+  --color-magenta: #C51AD8;
+  --color-violet: #8B2AC2;
+  --color-purple-gray: #3F3857;
+  --color-offwhite: #F5EFE8;
+  --color-text: #F5EFE8;
+  --color-muted: #ADA4B6;
+  --color-faint: #777083;
+  --color-border: rgba(245,239,232,.13);
+  --color-border-accent: rgba(197,26,216,.38);
+  --color-success: #50D59B;
+  --color-warning: #E9BD73;
+  --color-error: #FF748A;
+  --brand-gradient: linear-gradient(112deg, #8B2AC2 0%, #C51AD8 52%, #F5EFE8 100%);
+  --ambient-gradient: radial-gradient(ellipse at 74% 20%, rgba(197,26,216,.22), transparent 49%), radial-gradient(ellipse at 19% 77%, rgba(139,42,194,.17), transparent 48%);
+
+  --font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-lg: 18px;
+  --text-title: clamp(28px, 4vw, 52px);
+  --text-display: clamp(58px, 8vw, 108px);
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --radius-sharp: 0px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-pill: 9999px;
+
+  --shadow-sm: 0 4px 16px rgba(0,0,0,.35);
+  --shadow-md: 0 16px 48px rgba(0,0,0,.5);
+  --shadow-lg: 0 32px 90px rgba(0,0,0,.65);
+  --shadow-glow: 0 0 42px rgba(197,26,216,.28);
+
+  --ease-fast: 150ms ease;
+  --ease-normal: 250ms ease;
+}

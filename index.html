@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>Linkadas — Business Growth &amp; Marketing</title>
+  <meta name="description" content="Estratégia, implantação comercial e performance integradas para empresas que valorizam eficiência, inteligência de mercado e resultados mensuráveis.">
+  <link rel="icon" type="image/png" href="assets/img/linkadas-symbol.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/hero.css">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./assets/vendor/three/three.module.min.js",
+        "three/addons/": "./assets/vendor/three/addons/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar" data-navbar>
+    <div class="container navbar__inner">
+      <a class="navbar__brand" href="#inicio" aria-label="Linkadas — início">
+        <img class="navbar__logo" src="assets/img/linkadas-logo.png" alt="Linkadas — Agência criativa" width="1597" height="372">
+      </a>
+      <!-- Links de navegação: preencher quando as seções/destinos do site forem definidos -->
+      <nav aria-label="Principal"><ul class="navbar__links"></ul></nav>
+      <div class="navbar__actions">
+        <a class="btn btn-primary btn-sm" href="#diagnostico" data-cta>
+          Solicitar diagnóstico estratégico <span class="btn__icon" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="inicio" aria-labelledby="hero-title">
+      <div class="hero__ambient" aria-hidden="true"></div>
+      <div class="hero__grid" aria-hidden="true"></div>
+      <div class="hero__visual" data-hero-visual aria-hidden="true">
+        <div class="hero__fallback"></div>
+        <canvas class="hero__canvas" data-hero-canvas></canvas>
+      </div>
+      <div class="hero__veil" aria-hidden="true"></div>
+
+      <div class="container hero__content">
+        <p class="badge-split reveal" style="--reveal-order:0">
+          <span class="badge-split__chip">Linkadas</span>
+          <span class="badge-split__label">Business Growth &amp; Marketing</span>
+        </p>
+
+        <h1 class="hero__title reveal" id="hero-title" style="--reveal-order:1">
+          Sua próxima fase de crescimento exige uma <span class="grad-text">operação à&nbsp;altura.</span>
+        </h1>
+
+        <p class="hero__lead reveal" style="--reveal-order:2">
+          Estratégia, implantação comercial e performance integradas para empresas que valorizam eficiência, inteligência de mercado e resultados mensuráveis.
+        </p>
+
+        <div class="hero__actions reveal" style="--reveal-order:3" data-hero-anchor>
+          <a class="btn btn-primary btn-lg" href="#diagnostico" data-cta>
+            Solicitar diagnóstico estratégico <span class="btn__icon" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/main.js" defer></script>
+  <script type="module" src="assets/js/hero-ribbon.js"></script>
+</body>
+</html>
