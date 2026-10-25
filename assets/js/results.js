@@ -1,4 +1,4 @@
-/* Resultados: revelação ao rolar, abas de cases e paralaxe da composição */
+/* Resultados: revelação ao rolar e paralaxe das composições de imagens */
 (function () {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -17,77 +17,30 @@
     revealItems.forEach((item) => item.classList.add('is-in'));
   }
 
-  const root = document.querySelector('[data-cases]');
-  if (!root) return;
+  // Paralaxe: --p vai de -1 (case abaixo da tela) a 1 (case acima), 0 no centro da viewport
+  const cases = Array.from(document.querySelectorAll('[data-case]'));
+  if (!cases.length || reducedMotion.matches) return;
 
-  const tabs = Array.from(root.querySelectorAll('[data-case-tab]'));
-  const panels = Array.from(root.querySelectorAll('[data-case-panel]'));
-  let active = 0;
+  const visible = new Set();
+  let frame = 0;
 
-  // Abas: o avanço automático acompanha o fim da barra de progresso (CSS)
-  function select(index, { focus = false } = {}) {
-    active = (index + tabs.length) % tabs.length;
-    tabs.forEach((tab, i) => {
-      const on = i === active;
-      tab.classList.toggle('is-active', on);
-      tab.setAttribute('aria-selected', String(on));
-      tab.tabIndex = on ? 0 : -1;
+  function update() {
+    frame = 0;
+    const vh = window.innerHeight;
+    visible.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      const p = Math.max(-1, Math.min(1, (vh / 2 - center) / (vh / 2 + rect.height / 2)));
+      el.style.setProperty('--p', p.toFixed(4));
     });
-    panels.forEach((panel, i) => {
-      const on = i === active;
-      panel.classList.toggle('is-active', on);
-      panel.inert = !on;
-    });
-    if (focus) tabs[active].focus();
-    root.dispatchEvent(new CustomEvent('cases:change', { detail: { index: active } }));
   }
+  const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
 
-  tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => select(i));
-    tab.querySelector('.case-chip__progress')?.addEventListener('animationend', () => {
-      if (i === active) select(active + 1);
-    });
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => (entry.isIntersecting ? visible.add(entry.target) : visible.delete(entry.target)));
+    schedule();
   });
-
-  root.querySelector('[role="tablist"]').addEventListener('keydown', (event) => {
-    const keys = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 };
-    if (event.key in keys) select(active + keys[event.key], { focus: true });
-    else if (event.key === 'Home') select(0, { focus: true });
-    else if (event.key === 'End') select(tabs.length - 1, { focus: true });
-    else return;
-    event.preventDefault();
-  });
-
-  // Pausa enquanto o usuário interage ou a seção está fora da tela
-  let hovering = false;
-  let focused = false;
-  let inView = false;
-  const syncPause = () => root.classList.toggle('is-paused', hovering || focused || !inView);
-  root.addEventListener('pointerenter', () => { hovering = true; syncPause(); });
-  root.addEventListener('pointerleave', () => { hovering = false; syncPause(); });
-  root.addEventListener('focusin', () => { focused = true; syncPause(); });
-  root.addEventListener('focusout', () => { focused = false; syncPause(); });
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; syncPause(); }, { threshold: 0.25 }).observe(root);
-  }
-  syncPause();
-
-  // Paralaxe sutil das camadas
-  if (!reducedMotion.matches && window.matchMedia('(hover: hover)').matches) {
-    let frame;
-    root.addEventListener('pointermove', (event) => {
-      const rect = root.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = ((event.clientY - rect.top) / rect.height) * 2 - 1;
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        root.style.setProperty('--px', x.toFixed(3));
-        root.style.setProperty('--py', y.toFixed(3));
-      });
-    });
-    root.addEventListener('pointerleave', () => {
-      root.style.setProperty('--px', '0');
-      root.style.setProperty('--py', '0');
-    });
-  }
+  cases.forEach((el) => observer.observe(el));
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
 })();

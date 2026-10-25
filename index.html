@@ -77,90 +77,165 @@
       </div>
     </section>
 
-    <!-- Resultados (track record) -->
+    <!-- Resultados (track record / cases de sucesso) -->
     <section class="results" id="resultados" aria-labelledby="results-title">
-      <div class="results__ambient" aria-hidden="true"></div>
+      <div class="results__bg" aria-hidden="true">
+        <div class="results__bg-sticky" data-results-bg>
+          <canvas class="results__bg-canvas" data-results-bg-canvas></canvas>
+        </div>
+      </div>
 
-      <div class="container results__inner">
-        <div class="results__content">
+      <div class="container">
+        <header class="results__header">
           <span class="badge badge-brand badge-dot reveal-scroll" style="--reveal-order:0">Our Track Record</span>
-
           <h2 class="results__title reveal-scroll" id="results-title" style="--reveal-order:1">
             Resultados que <span class="grad-text">dispensam adjetivos.</span>
           </h2>
-
           <p class="results__lead reveal-scroll" style="--reveal-order:2">
             Estratégia se valida na execução. Conheça parte da experiência que sustenta nossa atuação.
           </p>
+        </header>
 
-          <div class="results__actions reveal-scroll" style="--reveal-order:3">
-            <a class="btn btn-primary btn-lg" href="#diagnostico" data-cta>
-              Solicitar diagnóstico estratégico <span class="btn__icon" aria-hidden="true">↗</span>
-            </a>
+        <div class="results__cases">
+        <!-- Case 01 -->
+        <article class="case case--text-left case--layout-a" aria-labelledby="case-01-label" data-case>
+          <div class="case__content">
+            <h3 class="case__label reveal-scroll" id="case-01-label" style="--reveal-order:0">
+              <span class="case__index">Case 01</span>
+              <span class="case__sep" aria-hidden="true">—</span>
+              <span class="case__category">Growth &amp; Lançamento</span>
+            </h3>
+            <p class="case__value grad-text reveal-scroll" style="--reveal-order:1">+R$ 600 MIL</p>
+            <p class="case__headline reveal-scroll" style="--reveal-order:2">Faturamento em um lançamento 100% orgânico.</p>
+            <p class="case__text reveal-scroll" style="--reveal-order:3">Estratégia comercial estruturada por meio de um grupo VIP, com foco em geração de demanda e conversão, sem investimento em mídia paga.</p>
           </div>
+
+          <div class="case__media reveal-scroll" style="--reveal-order:1">
+            <div class="case__media-frame" aria-hidden="true" style="--speed:-0.04"></div>
+              <figure class="media-slot media-slot--main" style="--speed:0" data-slot="case-01-principal">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-01-principal.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem principal</span></div>
+              </figure>
+              <figure class="media-slot media-slot--a" style="--speed:0.1" data-slot="case-01-secundaria-1">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-01-secundaria-1.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+              <figure class="media-slot media-slot--b" style="--speed:0.16" data-slot="case-01-secundaria-2">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-01-secundaria-2.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+              <figure class="media-slot media-slot--c" style="--speed:0.07" data-slot="case-01-secundaria-3">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-01-secundaria-3.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+          </div>
+        </article>
+        <!-- Case 02 -->
+        <article class="case case--text-right case--layout-b" aria-labelledby="case-02-label" data-case>
+          <div class="case__content">
+            <h3 class="case__label reveal-scroll" id="case-02-label" style="--reveal-order:0">
+              <span class="case__index">Case 02</span>
+              <span class="case__sep" aria-hidden="true">—</span>
+              <span class="case__category">Organic Performance</span>
+            </h3>
+            <p class="case__value grad-text reveal-scroll" style="--reveal-order:1">+1 MILHÃO</p>
+            <p class="case__headline reveal-scroll" style="--reveal-order:2">De visualizações em um único conteúdo.</p>
+            <p class="case__text reveal-scroll" style="--reveal-order:3">Produção audiovisual orientada por estratégia, com resultados de alcance orgânico que ultrapassaram 400 mil visualizações em outros conteúdos.</p>
+          </div>
+
+          <div class="case__media reveal-scroll" style="--reveal-order:1">
+            <div class="case__media-frame" aria-hidden="true" style="--speed:-0.04"></div>
+              <figure class="media-slot media-slot--main" style="--speed:0" data-slot="case-02-principal">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-02-principal.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem principal</span></div>
+              </figure>
+              <figure class="media-slot media-slot--a" style="--speed:0.1" data-slot="case-02-secundaria-1">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-02-secundaria-1.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+              <figure class="media-slot media-slot--b" style="--speed:0.16" data-slot="case-02-secundaria-2">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-02-secundaria-2.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+              <figure class="media-slot media-slot--c" style="--speed:0.07" data-slot="case-02-secundaria-3">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-02-secundaria-3.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+          </div>
+        </article>
+        <!-- Case 03 -->
+        <article class="case case--text-left case--layout-b" aria-labelledby="case-03-label" data-case>
+          <div class="case__content">
+            <h3 class="case__label reveal-scroll" id="case-03-label" style="--reveal-order:0">
+              <span class="case__index">Case 03</span>
+              <span class="case__sep" aria-hidden="true">—</span>
+              <span class="case__category">Business Expansion</span>
+            </h3>
+            <p class="case__value grad-text reveal-scroll" style="--reveal-order:1">+60 UNIDADES</p>
+            <p class="case__headline reveal-scroll" style="--reveal-order:2">Experiência em implantação de operações.</p>
+            <p class="case__text reveal-scroll" style="--reveal-order:3">Atuação da nossa fundadora na expansão da Action 360, com mais de 60 unidades implantadas. Expertise que fundamenta nossos projetos de estruturação comercial.</p>
+          </div>
+
+          <div class="case__media reveal-scroll" style="--reveal-order:1">
+            <div class="case__media-frame" aria-hidden="true" style="--speed:-0.04"></div>
+              <figure class="media-slot media-slot--main" style="--speed:0" data-slot="case-03-principal">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-03-principal.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem principal</span></div>
+              </figure>
+              <figure class="media-slot media-slot--a" style="--speed:0.1" data-slot="case-03-secundaria-1">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-03-secundaria-1.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+              <figure class="media-slot media-slot--b" style="--speed:0.16" data-slot="case-03-secundaria-2">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-03-secundaria-2.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+              <figure class="media-slot media-slot--c" style="--speed:0.07" data-slot="case-03-secundaria-3">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-03-secundaria-3.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+          </div>
+        </article>
+        <!-- Case 04 -->
+        <article class="case case--text-right case--layout-a" aria-labelledby="case-04-label" data-case>
+          <div class="case__content">
+            <h3 class="case__label reveal-scroll" id="case-04-label" style="--reveal-order:0">
+              <span class="case__index">Case 04</span>
+              <span class="case__sep" aria-hidden="true">—</span>
+              <span class="case__category">International Experience</span>
+            </h3>
+            <p class="case__value grad-text reveal-scroll" style="--reveal-order:1">7 DIAS</p>
+            <p class="case__headline reveal-scroll" style="--reveal-order:2">De cobertura audiovisual em Estocolmo.</p>
+            <p class="case__text reveal-scroll" style="--reveal-order:3">Produção e operação presencial durante um evento internacional na Suécia, demonstrando nossa capacidade de execução além das fronteiras brasileiras.</p>
+          </div>
+
+          <div class="case__media reveal-scroll" style="--reveal-order:1">
+            <div class="case__media-frame" aria-hidden="true" style="--speed:-0.04"></div>
+              <figure class="media-slot media-slot--main" style="--speed:0" data-slot="case-04-principal">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-04-principal.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem principal</span></div>
+              </figure>
+              <figure class="media-slot media-slot--a" style="--speed:0.1" data-slot="case-04-secundaria-1">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-04-secundaria-1.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+              <figure class="media-slot media-slot--b" style="--speed:0.16" data-slot="case-04-secundaria-2">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-04-secundaria-2.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+              <figure class="media-slot media-slot--c" style="--speed:0.07" data-slot="case-04-secundaria-3">
+                <!-- Substituir pelo arquivo definitivo: <img src="assets/img/cases/case-04-secundaria-3.jpg" alt="Descrição da imagem" loading="lazy"> -->
+                <div class="media-slot__placeholder" aria-hidden="true"><span>Imagem secundária</span></div>
+              </figure>
+          </div>
+        </article>
         </div>
 
-        <div class="results__visual reveal-scroll" style="--reveal-order:1" data-cases>
-          <div class="results__ghost" aria-hidden="true"></div>
-
-          <div class="results__stage" data-depth="0.4" data-results-visual aria-hidden="true">
-            <canvas class="results__canvas" data-results-canvas></canvas>
-            <div class="results__stage-light"></div>
-            <span class="results__corner results__corner--tl"></span>
-            <span class="results__corner results__corner--tr"></span>
-            <span class="results__corner results__corner--bl"></span>
-            <span class="results__corner results__corner--br"></span>
-          </div>
-
-          <div class="case-tabs" role="tablist" aria-label="Cases" data-depth="1.1">
-            <button class="case-chip is-active" type="button" role="tab" id="case-tab-1" aria-controls="case-panel-1" aria-selected="true" data-case-tab>
-              <span class="case-chip__index">Case 01</span>
-              <span class="case-chip__value">+R$ 600 MIL</span>
-              <span class="case-chip__progress" aria-hidden="true"></span>
-            </button>
-            <button class="case-chip" type="button" role="tab" id="case-tab-2" aria-controls="case-panel-2" aria-selected="false" tabindex="-1" data-case-tab>
-              <span class="case-chip__index">Case 02</span>
-              <span class="case-chip__value">+1 MILHÃO</span>
-              <span class="case-chip__progress" aria-hidden="true"></span>
-            </button>
-            <button class="case-chip" type="button" role="tab" id="case-tab-3" aria-controls="case-panel-3" aria-selected="false" tabindex="-1" data-case-tab>
-              <span class="case-chip__index">Case 03</span>
-              <span class="case-chip__value">+60 UNIDADES</span>
-              <span class="case-chip__progress" aria-hidden="true"></span>
-            </button>
-            <button class="case-chip" type="button" role="tab" id="case-tab-4" aria-controls="case-panel-4" aria-selected="false" tabindex="-1" data-case-tab>
-              <span class="case-chip__index">Case 04</span>
-              <span class="case-chip__value">7 DIAS</span>
-              <span class="case-chip__progress" aria-hidden="true"></span>
-            </button>
-          </div>
-
-          <div class="case-card" data-depth="1.6">
-            <article class="case-card__panel is-active" role="tabpanel" id="case-panel-1" aria-labelledby="case-tab-1" data-case-panel>
-              <h3 class="case-card__label">Case 01 — Growth &amp; Lançamento</h3>
-              <p class="case-card__value grad-text">+R$ 600 MIL</p>
-              <p class="case-card__headline">Faturamento em um lançamento 100% orgânico.</p>
-              <p class="case-card__text">Estratégia comercial estruturada por meio de um grupo VIP, com foco em geração de demanda e conversão, sem investimento em mídia paga.</p>
-            </article>
-            <article class="case-card__panel" role="tabpanel" id="case-panel-2" aria-labelledby="case-tab-2" data-case-panel inert>
-              <h3 class="case-card__label">Case 02 — Organic Performance</h3>
-              <p class="case-card__value grad-text">+1 MILHÃO</p>
-              <p class="case-card__headline">De visualizações em um único conteúdo.</p>
-              <p class="case-card__text">Produção audiovisual orientada por estratégia, com resultados de alcance orgânico que ultrapassaram 400 mil visualizações em outros conteúdos.</p>
-            </article>
-            <article class="case-card__panel" role="tabpanel" id="case-panel-3" aria-labelledby="case-tab-3" data-case-panel inert>
-              <h3 class="case-card__label">Case 03 — Business Expansion</h3>
-              <p class="case-card__value grad-text">+60 UNIDADES</p>
-              <p class="case-card__headline">Experiência em implantação de operações.</p>
-              <p class="case-card__text">Atuação da nossa fundadora na expansão da Action 360, com mais de 60 unidades implantadas. Expertise que fundamenta nossos projetos de estruturação comercial.</p>
-            </article>
-            <article class="case-card__panel" role="tabpanel" id="case-panel-4" aria-labelledby="case-tab-4" data-case-panel inert>
-              <h3 class="case-card__label">Case 04 — International Experience</h3>
-              <p class="case-card__value grad-text">7 DIAS</p>
-              <p class="case-card__headline">De cobertura audiovisual em Estocolmo.</p>
-              <p class="case-card__text">Produção e operação presencial durante um evento internacional na Suécia, demonstrando nossa capacidade de execução além das fronteiras brasileiras.</p>
-            </article>
-          </div>
+        <div class="results__cta reveal-scroll">
+          <span class="results__cta-line" aria-hidden="true"></span>
+          <a class="btn btn-primary btn-lg" href="#diagnostico" data-cta>
+            Solicitar diagnóstico estratégico <span class="btn__icon" aria-hidden="true">↗</span>
+          </a>
         </div>
       </div>
     </section>
@@ -169,6 +244,6 @@
   <script src="assets/js/main.js" defer></script>
   <script src="assets/js/results.js" defer></script>
   <script type="module" src="assets/js/hero-ribbon.js"></script>
-  <script type="module" src="assets/js/results-visual.js"></script>
+  <script type="module" src="assets/js/results-gradient.js"></script>
 </body>
 </html>
