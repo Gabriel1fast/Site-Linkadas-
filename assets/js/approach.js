@@ -1,6 +1,8 @@
 /* 6ª dobra — fundo de lâminas de luz curvas (WebGL puro) que se movem com a rolagem,
    e cartões de solução que entram um de cada vez. Apenas cores oficiais do Design System. */
 
+import { deviceDpr, createLoop, whenNear } from './lib/perf.js';
+
 const section = document.querySelector('[data-approach]');
 const canvas = section?.querySelector('[data-approach-canvas]');
 const solutions = section?.querySelector('[data-solutions]');
@@ -136,11 +138,11 @@ class LightSheets {
     this.resize();
   }
 
-  // Resolução nativa da tela (até 2x): bordas nítidas, sem serrilhado
+  // Resolução conforme o aparelho (e reduzida automaticamente se os quadros atrasarem)
   resize() {
     const { clientWidth: w, clientHeight: h } = this.sticky;
     if (!w || !h) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = deviceDpr() * (this.resScale || 1);
     this.canvas.width = Math.round(w * dpr);
     this.canvas.height = Math.round(h * dpr);
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
@@ -159,28 +161,12 @@ class LightSheets {
 function init() {
   if (!section) return;
 
-  let sheets = null;
-  if (canvas) {
-    try {
-      sheets = new LightSheets(canvas);
-      requestAnimationFrame(() => canvas.parentElement.classList.add('is-ready'));
-    } catch (error) {
-      console.warn('[abordagem] WebGL indisponível; mantendo o fundo em CSS.', error);
-    }
-  }
-
-  if (reducedMotion.matches) return; // cartões visíveis e fundo estático
-
-  // Progresso da seção (0 ao entrar pela base da tela, 1 ao sair pelo topo) move as lâminas;
-  // o dos cartões vai de 0 (lista entrando) a 1 (lista perto do centro da tela)
+  // Progresso dos cartões: vai de 0 (lista entrando) a 1 (lista perto do centro da tela)
   let target = 0;
-  let last = performance.now();
-  let running = false;
-  let raf = 0;
-
   function measure() {
     const vh = window.innerHeight;
     const r = section.getBoundingClientRect();
+    // Progresso da seção move as lâminas de luz (0 ao entrar pela base, 1 ao sair pelo topo)
     target = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
     if (solutions) {
       const l = solutions.getBoundingClientRect();
@@ -188,27 +174,38 @@ function init() {
     }
   }
 
-  function tick(now) {
-    if (!running) return;
-    raf = requestAnimationFrame(tick);
-    const dt = Math.min((now - last) / 1000, 0.1);
-    last = now;
-    if (sheets) {
-      sheets.time += dt;
-      // Movimento amortecido e independente da taxa de quadros
-      sheets.p += (target - sheets.p) * (1 - Math.exp(-dt * 3.2));
-      sheets.draw();
-    }
-  }
+  if (reducedMotion.matches) return; // cartões visíveis e fundo estático
 
   window.addEventListener('scroll', measure, { passive: true });
   window.addEventListener('resize', measure);
-  new IntersectionObserver(([entry]) => {
-    running = entry.isIntersecting && !document.hidden;
-    if (running) { last = performance.now(); raf = requestAnimationFrame(tick); } else cancelAnimationFrame(raf);
-  }).observe(section);
   measure();
-  if (sheets) { sheets.p = target; sheets.draw(); }
+
+  // O fundo WebGL só é criado quando a seção se aproxima da tela; luz lenta → 30 fps bastam
+  if (!canvas) return;
+  whenNear(section, () => {
+    let sheets;
+    try {
+      sheets = new LightSheets(canvas);
+      requestAnimationFrame(() => canvas.parentElement.classList.add('is-ready'));
+    } catch (error) {
+      console.warn('[abordagem] WebGL indisponível; mantendo o fundo em CSS.', error);
+      return;
+    }
+    measure();
+    sheets.p = target;
+    sheets.draw();
+    createLoop({
+      el: section,
+      fps: 30,
+      frame: (dt) => {
+        sheets.time += dt;
+        // Movimento amortecido e independente da taxa de quadros
+        sheets.p += (target - sheets.p) * (1 - Math.exp(-dt * 3.2));
+        sheets.draw();
+      },
+      onScale: (scale) => { sheets.resScale = scale; sheets.resize(); },
+    });
+  });
 }
 
 init();

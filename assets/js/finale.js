@@ -6,6 +6,10 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { readPalette, createRibbonGeometry, createGlassMaterial, webglAvailable } from './lib/glass.js';
+import { tier, QUALITY, deviceDpr, createLoop, whenNear } from './lib/perf.js';
+
+const DETAIL = tier === 'high' ? 1 : 0.5;
+const seg = (n) => Math.round(n * DETAIL);
 
 const section = document.querySelector('[data-finale]');
 const visual = section?.querySelector('[data-finale-visual]');
@@ -110,7 +114,8 @@ class FinaleScene {
     this.pointer = new THREE.Vector2();
     this.pointerTarget = new THREE.Vector2();
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+    this.resScale = 1;
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
     this.renderer.setClearColor(0x000000, 1);
     this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
     this.scene = new THREE.Scene();
@@ -118,11 +123,11 @@ class FinaleScene {
 
     this.build();
 
-    // Pós-processamento com multisampling 4x (o antialias nativo não se aplica ao composer)
-    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: this.renderer.capabilities.isWebGL2 ? 4 : 0 });
+    // Pós-processamento: multisampling só em computadores (o antialias nativo não se aplica ao composer)
+    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: this.renderer.capabilities.isWebGL2 ? QUALITY.msaa : 0 });
     this.composer = new EffectComposer(this.renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.85, 0.5, 0.38);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(QUALITY.bloomRes, QUALITY.bloomRes), 0.85, 0.5, 0.38);
     this.composer.addPass(this.bloom);
 
     new ResizeObserver(() => this.resize()).observe(visual);
@@ -138,7 +143,7 @@ class FinaleScene {
   build() {
     // Portal principal: anel largo de vidro, de frente para a câmera
     this.portal = new THREE.Mesh(
-      createRibbonGeometry(circle(5.2), { segments: 520, radial: 40, width: 0.55, thickness: 0.18, closed: true, twist: () => 0 }),
+      createRibbonGeometry(circle(5.2), { segments: seg(520), radial: seg(40), width: 0.55, thickness: 0.18, closed: true, twist: () => 0 }),
       this.glass({ intensity: 0.95, sweep: 1.4 }),
     );
     this.portal.position.set(0, 0.35, 0);
@@ -175,7 +180,7 @@ class FinaleScene {
   resize() {
     const { clientWidth: w, clientHeight: h } = visual;
     if (!w || !h) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = deviceDpr() * this.resScale;
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(dpr);
@@ -251,21 +256,12 @@ function init() {
     scene.pointerTarget.set((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
   }, { passive: true });
 
-  let running = false;
-  let last = 0;
-  let raf = 0;
-  const tick = (now) => {
-    if (!running) return;
-    raf = requestAnimationFrame(tick);
-    const dt = Math.min((now - last) / 1000, 0.1);
-    last = now;
-    scene.update(dt);
-    scene.render();
-  };
-  new IntersectionObserver(([entry]) => {
-    running = entry.isIntersecting && !document.hidden;
-    if (running) { last = performance.now(); raf = requestAnimationFrame(tick); } else cancelAnimationFrame(raf);
-  }).observe(section);
+  createLoop({
+    el: section,
+    frame: (dt) => { scene.update(dt); scene.render(); },
+    onScale: (scale) => { scene.resScale = scale; scene.resize(); },
+  });
 }
 
-init();
+// A cena só é criada quando o visitante se aproxima do fim da página
+if (section) whenNear(section, init);

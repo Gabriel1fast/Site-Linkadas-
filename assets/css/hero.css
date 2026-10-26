@@ -122,11 +122,10 @@
 .reveal {
   opacity: 0;
   transform: translateY(18px);
-  filter: blur(6px);
-  transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1), filter 900ms cubic-bezier(.2,.7,.2,1);
+  transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1);
   transition-delay: calc(var(--reveal-order, 0) * 110ms + 120ms);
 }
-.is-loaded .reveal { opacity: 1; transform: none; filter: none; }
+.is-loaded .reveal { opacity: 1; transform: none; }
 
 @media (max-width: 650px) {
   .hero { min-height: max(100svh, 720px); }
@@ -138,6 +137,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; filter: none; }
+  .reveal { opacity: 1; transform: none; }
   .hero__canvas { transition: none; }
 }

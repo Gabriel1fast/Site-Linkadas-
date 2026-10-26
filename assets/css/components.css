@@ -60,9 +60,7 @@
   display: inline-flex;
   align-items: stretch;
   border: 1px solid var(--color-border);
-  background: rgba(9,5,14,.6);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  background: rgba(9,5,14,.85);
   font: 700 10px/1 var(--font);
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -99,12 +97,11 @@
   inset: 0 0 auto;
   z-index: 60;
   border-bottom: 1px solid transparent;
-  transition: background var(--ease-normal), border-color var(--ease-normal), backdrop-filter var(--ease-normal);
+  transition: background var(--ease-normal), border-color var(--ease-normal);
 }
 .navbar.is-scrolled {
-  background: rgba(0,0,0,.72);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  /* Fundo sólido translúcido: o desfoque sobre as animações 3D custava caro a cada quadro */
+  background: rgba(0,0,0,.86);
   border-bottom-color: var(--color-border);
 }
 .navbar__inner {
@@ -165,12 +162,11 @@
 .reveal-scroll {
   opacity: 0;
   transform: translateY(24px);
-  filter: blur(6px);
-  transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1), filter 900ms cubic-bezier(.2,.7,.2,1);
+  transition: opacity 900ms cubic-bezier(.2,.7,.2,1), transform 900ms cubic-bezier(.2,.7,.2,1);
   transition-delay: calc(var(--reveal-order, 0) * 110ms);
 }
-.reveal-scroll.is-in { opacity: 1; transform: none; filter: none; }
+.reveal-scroll.is-in { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .reveal-scroll { opacity: 1; transform: none; filter: none; }
+  .reveal-scroll { opacity: 1; transform: none; }
 }

@@ -47,8 +47,10 @@
     section.style.setProperty('--p', progress(intro).toFixed(4));
     specialties.style.setProperty('--s', progress(specialties).toFixed(4));
   }
+  let near = false;
+  new IntersectionObserver(([entry]) => { near = entry.isIntersecting; if (near) schedule(); }, { rootMargin: '200px 0px' }).observe(section);
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
-  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('scroll', () => { if (near) schedule(); }, { passive: true });
   window.addEventListener('resize', schedule);
   update();
 })();
