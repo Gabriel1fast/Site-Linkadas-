@@ -1,9 +1,12 @@
-/* Manifesto: a seção prende na tela e o texto acende palavra a palavra conforme a rolagem
-   (rolando para cima, as palavras voltam a apagar). */
+/* 5ª dobra: duas etapas presas na tela, guiadas pela rolagem (e reversíveis ao subir).
+   1) Manifesto: o texto acende palavra a palavra.
+   2) Especialidades: os quadros entram um a um da direita para a esquerda; depois, o CTA. */
 (function () {
   const section = document.querySelector('[data-manifesto]');
+  const intro = section?.querySelector('[data-manifesto-intro]');
   const text = section?.querySelector('[data-manifesto-text]');
-  if (!section || !text) return;
+  const specialties = section?.querySelector('[data-specialties]');
+  if (!section || !intro || !text || !specialties) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   // Envolve cada palavra num <span>, preservando os trechos de ênfase (<em>)
@@ -28,17 +31,21 @@
     });
   };
   wrap(text);
-  // Margem no fim: a última palavra acende antes de a seção soltar
+  // Margem no fim: a última palavra acende antes de a etapa soltar
   text.style.setProperty('--n', index + 2);
   section.classList.add('is-scrubbing');
+
+  // Progresso 0→1 enquanto a etapa está presa na tela
+  const progress = (el) => {
+    const scrollable = el.offsetHeight - window.innerHeight;
+    return Math.min(1, Math.max(0, -el.getBoundingClientRect().top / scrollable));
+  };
 
   let frame = 0;
   function update() {
     frame = 0;
-    const rect = section.getBoundingClientRect();
-    const scrollable = section.offsetHeight - window.innerHeight;
-    const p = Math.min(1, Math.max(0, -rect.top / scrollable));
-    section.style.setProperty('--p', p.toFixed(4));
+    section.style.setProperty('--p', progress(intro).toFixed(4));
+    specialties.style.setProperty('--s', progress(specialties).toFixed(4));
   }
   const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
   window.addEventListener('scroll', schedule, { passive: true });

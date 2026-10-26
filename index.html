@@ -421,13 +421,54 @@
       </div>
     </section>
 
-    <!-- Manifesto: texto revelado palavra a palavra pela rolagem -->
-    <section class="manifesto" id="manifesto" aria-label="Manifesto" data-manifesto>
-      <div class="manifesto__pin">
-        <div class="container">
-          <p class="manifesto__text" data-manifesto-text>
-            Marketing é parte da operação. <em>Não uma atividade isolada.</em> Integramos as disciplinas necessárias para transformar planejamento em <em>execução coordenada.</em>
-          </p>
+    <!-- 5ª dobra: manifesto (palavra a palavra) + especialidades (quadros da direita para a esquerda) -->
+    <section class="manifesto" id="manifesto" aria-labelledby="specialties-title" data-manifesto>
+      <div class="manifesto__intro" data-manifesto-intro>
+        <div class="manifesto__pin">
+          <div class="container">
+            <p class="manifesto__text" data-manifesto-text>
+              Marketing é parte da operação. <em>Não uma atividade isolada.</em> Integramos as disciplinas necessárias para transformar planejamento em <em>execução coordenada.</em>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="specialties" id="especialidades" data-specialties>
+        <div class="specialties__pin">
+          <div class="container specialties__inner">
+            <header class="specialties__header">
+              <span class="badge badge-brand badge-dot">Nossas especialidades</span>
+              <h2 class="visually-hidden" id="specialties-title">Nossas especialidades</h2>
+            </header>
+            <div class="specialties__track">
+              <article class="specialty" style="--i:0" data-specialty aria-labelledby="specialty-01">
+                <span class="specialty__index" aria-hidden="true">01</span>
+                <h3 class="specialty__title" id="specialty-01">Estruturação de Negócios</h3>
+                <p class="specialty__tagline">Estrutura para sustentar a expansão.</p>
+                <span class="specialty__rule" aria-hidden="true"></span>
+                <p class="specialty__text">Implantação de processos comerciais, CRM, WhatsApp, posicionamento e campanhas para empresas, redes e franquias.</p>
+              </article>
+              <article class="specialty" style="--i:1" data-specialty aria-labelledby="specialty-02">
+                <span class="specialty__index" aria-hidden="true">02</span>
+                <h3 class="specialty__title" id="specialty-02">Crescimento e Performance</h3>
+                <p class="specialty__tagline">Inteligência aplicada ao investimento.</p>
+                <span class="specialty__rule" aria-hidden="true"></span>
+                <p class="specialty__text">Gestão de tráfego, análise de indicadores, dashboards e otimização de campanhas orientadas por objetivos comerciais.</p>
+              </article>
+              <article class="specialty" style="--i:2" data-specialty aria-labelledby="specialty-03">
+                <span class="specialty__index" aria-hidden="true">03</span>
+                <h3 class="specialty__title" id="specialty-03">Marketing Estratégico e Criatividade</h3>
+                <p class="specialty__tagline">Criatividade com propósito de negócio.</p>
+                <span class="specialty__rule" aria-hidden="true"></span>
+                <p class="specialty__text">Estratégia de marca, social media, produção audiovisual, campanhas, design e experiências digitais.</p>
+              </article>
+            </div>
+            <div class="specialties__cta">
+              <a class="btn btn-primary btn-lg" href="#solucoes" data-cta>
+                Conhecer nossas soluções <span class="btn__icon" aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
