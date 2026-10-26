@@ -21,13 +21,13 @@
 }
 
 /* Papel premium: grão + curvas de nível + luz lavanda atrás do mapa */
-/* Papel pontilhado (grade de pontos com 50% de opacidade) */
+/* Papel pontilhado: grade de pontos pretos bem suave */
 .presence__paper {
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(24,7,43,.5) 1.1px, transparent 1.5px);
+  background-image: radial-gradient(circle, rgba(0,0,0,.14) 1px, transparent 1.4px);
   background-size: 35px 35px;
   background-position: center top;
 }
