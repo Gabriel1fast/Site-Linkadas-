@@ -28,6 +28,13 @@ const STAGES = [
   { base: ['black', 'deep', 0.38], blobs: [[0.5, 0.78, 0.5, 0.46, 'magenta'], [0.5, 0.3, 0.6, 0.24, 'violet'], [0.85, 0.6, 0.45, 0.16, 'gray']] },
 ];
 
+/* Fundadoras: roxo profundo quase preto, luz atrás de cada retrato e depois no fechamento */
+const FOUNDERS_STAGES = [
+  { base: ['black', 'deep', 0.65], blobs: [[0.27, 0.42, 0.5, 0.5, 'violet'], [0.73, 0.42, 0.5, 0.46, 'magenta'], [0.5, 0.9, 0.6, 0.2, 'gray']] },
+  { base: ['black', 'deep', 0.6], blobs: [[0.5, 0.62, 0.52, 0.46, 'magenta'], [0.18, 0.28, 0.5, 0.3, 'violet'], [0.82, 0.28, 0.5, 0.3, 'violet']] },
+];
+const STAGE_SETS = { results: STAGES, founders: FOUNDERS_STAGES };
+
 const VERTEX = `
   attribute vec2 position;
   void main() { gl_Position = vec4(position, 0.0, 1.0); }
@@ -97,11 +104,11 @@ function resolveStage(stage) {
 }
 
 class ScrollGradient {
-  constructor(sticky, canvas, section) {
+  constructor(sticky, canvas, section, stages = STAGES) {
     this.sticky = sticky;
     this.canvas = canvas;
     this.section = section;
-    this.stages = STAGES.map(resolveStage);
+    this.stages = stages.map(resolveStage);
     this.anchors = [];
     this.position = 0;
     this.target = 0;
@@ -169,10 +176,12 @@ class ScrollGradient {
     if (!this.running) this.draw();
   }
 
-  // Âncoras: centro vertical da abertura, de cada case e do CTA (em px dentro da seção)
+  // Âncoras: centro vertical de cada etapa (em px dentro da seção). Seções podem marcar as suas
+  // com [data-fluid-anchor]; nos Cases: abertura, cada case e o CTA.
   measure() {
     const top = this.section.getBoundingClientRect().top + window.scrollY;
-    const points = [
+    const marked = this.section.querySelectorAll('[data-fluid-anchor]');
+    const points = marked.length ? [...marked] : [
       this.section.querySelector('.results__header'),
       ...this.section.querySelectorAll('[data-case]'),
       this.section.querySelector('.results__cta'),
@@ -255,16 +264,18 @@ class ScrollGradient {
 }
 
 function initResultsGradient() {
-  const sticky = document.querySelector('[data-results-bg]');
-  const canvas = sticky?.querySelector('[data-results-bg-canvas]');
-  const section = sticky?.closest('section');
-  if (!sticky || !canvas || !section) return;
-  try {
-    new ScrollGradient(sticky, canvas, section);
-    requestAnimationFrame(() => sticky.classList.add('is-ready'));
-  } catch (error) {
-    console.warn('[resultados] Gradiente WebGL indisponível; mantendo o fundo em CSS.', error);
-  }
+  // [data-fluid-bg="<conjunto>"] reaproveita o mesmo fundo em outras seções
+  document.querySelectorAll('[data-results-bg], [data-fluid-bg]').forEach((sticky) => {
+    const canvas = sticky.querySelector('canvas');
+    const section = sticky.closest('section');
+    if (!canvas || !section) return;
+    try {
+      new ScrollGradient(sticky, canvas, section, STAGE_SETS[sticky.dataset.fluidBg] || STAGES);
+      requestAnimationFrame(() => sticky.classList.add('is-ready'));
+    } catch (error) {
+      console.warn('[fundo fluido] WebGL indisponível; mantendo o fundo em CSS.', error);
+    }
+  });
 }
 
 initResultsGradient();
