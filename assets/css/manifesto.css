@@ -1,0 +1,178 @@
+/* 5ª dobra — Manifesto + Especialidades
+   Fundo roxo profundo quase preto, sem iluminação. Duas etapas presas na tela:
+   1) o texto acende palavra a palavra; 2) os quadros de especialidades entram da direita. */
+.manifesto {
+  --p: 1;
+  position: relative;
+  background: #0B0414; /* roxo profundo (#18072B) escurecido, sem luzes */
+}
+
+/* ---------- Etapa 1: manifesto ---------- */
+.manifesto__pin {
+  display: grid;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-block: var(--space-16);
+}
+/* Com o efeito ativo, a etapa ganha altura para o percurso e o texto fica preso na tela */
+.manifesto.is-scrubbing .manifesto__intro { height: 260vh; }
+.manifesto.is-scrubbing .manifesto__pin { position: sticky; top: 0; height: 100vh; height: 100svh; }
+
+.manifesto__text {
+  max-width: 21em;
+  margin: 0 auto;
+  font-size: clamp(24px, 3.5vw, 52px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.02em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-text);
+  text-transform: uppercase;
+}
+.manifesto__text em { font-style: normal; color: #E388EF; }
+
+/* Cada palavra acende quando o progresso passa por ela */
+.manifesto__word {
+  opacity: clamp(.12, calc(var(--p) * var(--n) - var(--i)), 1);
+  transition: opacity 120ms linear;
+}
+
+/* ---------- Etapa 2: especialidades ---------- */
+.specialties { --s: 1; position: relative; }
+.manifesto.is-scrubbing .specialties { height: 300vh; }
+.specialties__pin {
+  display: grid;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-block: calc(76px + var(--space-8)) var(--space-12); /* respiro abaixo da navbar fixa */
+  overflow: hidden;
+}
+.manifesto.is-scrubbing .specialties__pin { position: sticky; top: 0; height: 100vh; height: 100svh; }
+
+.specialties__inner { display: grid; gap: clamp(28px, 4vh, 48px); }
+.specialties__header { display: flex; justify-content: center; }
+
+.specialties__track {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+}
+
+/* Iluminação de fundo atrás dos quadros; acende conforme eles entram */
+.specialties__track::before {
+  content: "";
+  position: absolute;
+  inset: -18% -8%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 55% at 50% 50%, rgba(197,26,216,.24), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 50% 55%, rgba(139,42,194,.22), transparent 72%);
+  filter: blur(24px);
+  opacity: clamp(.25, calc(var(--s) * 1.6), 1);
+}
+
+/* Quadro (componente card do Design System) */
+.specialty {
+  /* --c: progresso de entrada do quadro (0 = fora da tela à direita, 1 = no lugar) */
+  --c: clamp(0, calc(var(--s) * 3.6 - var(--i) * 1.05), 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(300px, 46vh, 420px);
+  padding: clamp(24px, 2.6vw, 36px);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  /* Metade superior em degradê da marca (violeta → magenta), dissolvendo na superfície escura */
+  background:
+    linear-gradient(180deg, transparent 0%, rgba(17,9,26,.35) 30%, var(--color-surface-2) 54%),
+    linear-gradient(135deg, var(--color-violet) 0%, var(--color-magenta) 100%) top / 100% 56% no-repeat,
+    var(--color-surface-2);
+  box-shadow: var(--shadow-md), 0 0 60px rgba(197,26,216,.22);
+  opacity: calc(.15 + var(--c) * .85);
+  transform: translate3d(calc((1 - var(--c)) * 110vw), 0, 0);
+  will-change: transform;
+  transition: border-color var(--ease-normal), box-shadow var(--ease-normal);
+}
+/* Barra superior com o gradiente da marca */
+.specialty::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--brand-gradient);
+}
+.specialty:hover { border-color: var(--color-border-accent); box-shadow: var(--shadow-md), 0 0 80px rgba(197,26,216,.38); }
+
+.specialty__index {
+  color: var(--color-offwhite);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: .14em;
+}
+.specialty__index::before { content: "/ "; color: rgba(245,239,232,.6); }
+.specialty__title {
+  margin: auto 0 0;
+  padding-top: var(--space-12);
+  font-size: clamp(24px, 2.2vw, 32px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -.04em;
+  text-wrap: balance;
+}
+.specialty__tagline {
+  margin: var(--space-3) 0 0;
+  color: #E388EF;
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+.specialty__rule {
+  display: block;
+  height: 1px;
+  margin-top: var(--space-5);
+  background: var(--color-border);
+}
+.specialty__text {
+  margin: var(--space-5) 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-base);
+  line-height: 1.7;
+}
+
+/* CTA aparece depois do último quadro */
+.specialties__cta {
+  display: flex;
+  justify-content: center;
+  opacity: clamp(0, calc((var(--s) - .88) * 9), 1);
+  transform: translateY(calc((1 - clamp(0, calc((var(--s) - .88) * 9), 1)) * 16px));
+}
+
+/* ---------- Celular: os quadros se empilham como um baralho ---------- */
+@media (max-width: 820px) {
+  .specialties__pin { padding-top: calc(64px + var(--space-6)); padding-bottom: var(--space-8); }
+  .specialties__track { grid-template-columns: 1fr; grid-template-areas: "stack"; }
+  .specialty {
+    grid-area: stack;
+    min-height: 0;
+    /* cada quadro novo cobre o anterior, que fica um pouco recuado e visível acima */
+    margin-top: calc(var(--i) * 14px);
+    transform: translate3d(calc((1 - var(--c)) * 110vw), 0, 0);
+    opacity: 1; /* quadro opaco: cobre o anterior sem misturar os textos */
+  }
+  .specialty__title { padding-top: var(--space-8); }
+  .specialties__cta .btn { width: 100%; --btn-pad-x: 16px; }
+}
+
+/* Sem JS ou com movimento reduzido: tudo visível, sem prender a tela */
+.manifesto:not(.is-scrubbing) .specialty { --c: 1; }
+.manifesto:not(.is-scrubbing) .specialties__track { grid-template-areas: none; }
+@media (max-width: 820px) {
+  .manifesto:not(.is-scrubbing) .specialty { grid-area: auto; margin-top: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .manifesto__word { opacity: 1; transition: none; }
+}

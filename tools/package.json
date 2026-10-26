@@ -1,0 +1,16 @@
+{
+  "name": "linkadas-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:map": "node build-presence-map.mjs",
+    "build:textures": "node build-presence-textures.mjs && python3 build-presence-relief.py"
+  },
+  "devDependencies": {
+    "d3-geo": "3.1.1",
+    "topojson-client": "3.1.0",
+    "topojson-simplify": "3.0.3",
+    "world-atlas": "2.0.2",
+    "d3-contour": "4.0.2"
+  }
+}

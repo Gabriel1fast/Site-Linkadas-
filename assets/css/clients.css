@@ -1,0 +1,112 @@
+/* Clientes — faixa de logos colada entre a Hero e os Cases.
+   Enquanto as logos passam, a Hero e a faixa ficam presas juntas (faixa no meio da tela);
+   no fim do percurso, os Cases sobem e encostam logo abaixo da faixa. */
+.clients {
+  --logo-h: clamp(48px, 5.8vw, 84px);
+  --gap: clamp(64px, 9vw, 144px);
+  position: relative;
+  /* Transparente: a área acima da faixa deixa ver a Hero presa por trás */
+  overflow-x: clip;
+}
+
+/* A faixa em si; o JS a fixa no meio da viewport durante o percurso */
+.clients__pin {
+  position: sticky;
+  top: calc(50vh - var(--band-h, 0px) / 2);
+  overflow: hidden;
+}
+
+/* Com o percurso ativo, a Hero também fica presa, mostrando sua base logo acima da faixa */
+.fold-stack.is-pinned > .hero {
+  position: sticky;
+  top: var(--hero-stick, 0px);
+}
+
+.clients__band {
+  position: relative;
+  padding-block: clamp(16px, 2vw, 24px);
+  background:
+    radial-gradient(ellipse 30% 90% at 50% 50%, rgba(139,42,194,.16), transparent 70%),
+    var(--color-bg);
+}
+/* Filetes superior e inferior: mais visíveis no centro, somem nas laterais */
+.clients__band::before,
+.clients__band::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border) 30%, var(--color-border-accent) 50%, var(--color-border) 70%, transparent);
+}
+.clients__band::before { top: 0; }
+.clients__band::after { bottom: 0; }
+
+.clients__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin: 0 0 clamp(8px, 1.2vw, 14px);
+  padding-inline: var(--space-6);
+  color: var(--color-text);
+  font-size: clamp(12px, 1vw, 14px);
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  text-align: center;
+}
+/* Filetes laterais com o gradiente da marca */
+.clients__title::before,
+.clients__title::after {
+  content: "";
+  flex: none;
+  width: clamp(24px, 4vw, 56px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-magenta));
+}
+.clients__title::after { transform: scaleX(-1); }
+
+.clients__track {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  width: max-content;
+  height: calc(var(--logo-h) * 1.2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
+}
+
+.clients__item {
+  flex: none;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.clients__item img {
+  width: auto;
+  height: calc(var(--logo-h) * var(--k, 1));
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@media (max-width: 650px) {
+  .clients { --logo-h: 54px; --gap: 56px; }
+}
+
+/* Sem JS ou com movimento reduzido: faixa estática, todas as logos visíveis */
+.clients.is-static .clients__pin { position: relative; top: auto; }
+.clients.is-static .clients__track {
+  flex-wrap: wrap;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  row-gap: var(--space-6);
+  padding-inline: var(--space-6);
+  transform: none;
+}
+.clients.is-static .clients__item { opacity: .85; transform: scale(.7); }
