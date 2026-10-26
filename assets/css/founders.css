@@ -42,7 +42,7 @@
   height: min(28vh, 240px);
 }
 .founders__bg::before { top: 0; background: linear-gradient(#050109, transparent); }
-.founders__bg::after { bottom: 0; background: linear-gradient(transparent, #000); }
+.founders__bg::after { bottom: 0; background: linear-gradient(transparent, #0B0414); } /* emenda com o Manifesto */
 
 /* ---------- Fundadoras ---------- */
 .founders__grid {

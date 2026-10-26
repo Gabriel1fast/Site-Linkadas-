@@ -1,0 +1,41 @@
+/* Manifesto — fundo roxo profundo quase preto, sem iluminação; texto revelado pela rolagem */
+.manifesto {
+  --p: 1;
+  position: relative;
+  background: #0B0414; /* roxo profundo (#18072B) escurecido, sem luzes */
+}
+/* Com o efeito ativo, a seção ganha altura para o percurso e o texto fica preso na tela */
+.manifesto.is-scrubbing { height: 260vh; }
+.manifesto__pin {
+  display: grid;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-block: var(--space-16);
+}
+.manifesto.is-scrubbing .manifesto__pin { position: sticky; top: 0; height: 100vh; height: 100svh; }
+
+.manifesto__text {
+  max-width: 21em;
+  margin: 0 auto;
+  font-size: clamp(32px, 4.6vw, 68px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -.045em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--color-text);
+}
+.manifesto__text em { font-style: normal; }
+
+/* Cada palavra acende quando o progresso passa por ela */
+.manifesto__word {
+  opacity: clamp(.12, calc(var(--p) * var(--n) - var(--i)), 1);
+  transition: opacity 120ms linear;
+}
+/* Trechos de ênfase em magenta claro (tom de destaque do Design System) */
+.manifesto__text em { color: #E388EF; }
+
+@media (prefers-reduced-motion: reduce) {
+  .manifesto__word { opacity: 1; transition: none; }
+}
