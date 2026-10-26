@@ -1,4 +1,4 @@
-/* Clientes: quando a faixa encosta na base da tela, ela e a Hero ficam presas juntas e a rolagem
+/* Clientes: quando a faixa chega ao meio da tela, ela e a Hero ficam presas juntas e a rolagem
    vertical conduz as logos da direita para a esquerda. Só depois que a última logo sai pela
    esquerda a página segue para os Cases (que entram colados à faixa); rolando para cima, o
    percurso se desfaz. No centro: 100% de opacidade e tamanho cheio; nas laterais: pequenas e
@@ -21,6 +21,7 @@
   let viewportW = 0;
   let viewportH = 0;
   let bandH = 0;
+  let pinTop = 0;
   let distance = 0;
   let centers = [];
   let frame = 0;
@@ -37,9 +38,10 @@
     // Percurso: a faixa entra inteira pela direita e sai inteira pela esquerda
     distance = viewportW + track.scrollWidth;
 
-    // Faixa presa na base da tela; Hero presa logo acima, com a base visível e colada à faixa
-    pin.style.top = `${viewportH - bandH}px`;
-    stack.style.setProperty('--hero-stick', `${viewportH - bandH - hero.offsetHeight}px`);
+    // Faixa presa no meio da tela; Hero presa logo acima, com a base visível e colada à faixa
+    pinTop = Math.round((viewportH - bandH) / 2);
+    pin.style.top = `${pinTop}px`;
+    stack.style.setProperty('--hero-stick', `${pinTop - hero.offsetHeight}px`);
     section.style.height = `${Math.round(bandH + distance * SCROLL_PER_PX)}px`;
     update();
   }
@@ -47,8 +49,8 @@
   function update() {
     frame = 0;
     const scrollable = section.offsetHeight - bandH;
-    // 0 quando a faixa encosta na base da tela; 1 quando o fim da seção chega à base
-    const passed = viewportH - bandH - section.getBoundingClientRect().top;
+    // 0 quando a faixa chega ao meio da tela; 1 quando a última logo sai pela esquerda
+    const passed = pinTop - section.getBoundingClientRect().top;
     const progress = Math.min(1, Math.max(0, passed / scrollable));
     const x = viewportW - progress * distance;
     track.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;

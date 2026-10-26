@@ -1,6 +1,6 @@
 /* Clientes — faixa de logos colada entre a Hero e os Cases.
-   Enquanto as logos passam, a Hero e a faixa ficam presas juntas (faixa na base da tela);
-   ao terminar, seguem juntas e os Cases entram colados logo abaixo. */
+   Enquanto as logos passam, a Hero e a faixa ficam presas juntas (faixa no meio da tela);
+   no fim do percurso, os Cases sobem e encostam logo abaixo da faixa. */
 .clients {
   --logo-h: clamp(48px, 5.8vw, 84px);
   --gap: clamp(64px, 9vw, 144px);
@@ -9,10 +9,10 @@
   overflow-x: clip;
 }
 
-/* A faixa em si; o JS a fixa na base da viewport durante o percurso */
+/* A faixa em si; o JS a fixa no meio da viewport durante o percurso */
 .clients__pin {
   position: sticky;
-  top: calc(100vh - var(--band-h, 0px));
+  top: calc(50vh - var(--band-h, 0px) / 2);
   overflow: hidden;
 }
 
