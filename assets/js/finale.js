@@ -31,13 +31,46 @@ const gridMaterial = (palette) => new THREE.ShaderMaterial({
     void main() {
       vec2 g = vec2(vWorld.x, vWorld.z + uFlow) / 1.6;
       vec2 w = fwidth(g);
-      vec2 l = 1.0 - smoothstep(vec2(0.0), w * 1.4, abs(fract(g - 0.5) - 0.5));
-      float line = max(l.x, l.y);
-      float dist = length(vWorld.xz);
+      vec2 dist = abs(fract(g - 0.5) - 0.5) / w;                  // distância à linha, em pixels
+      float core = 1.0 - smoothstep(0.0, 1.2, min(dist.x, dist.y)); // linha nítida (~1px, antisserrilhada)
+      float halo = exp(-min(dist.x, dist.y) * 0.6) * 0.18;           // brilho suave ao redor
+      // Anti-moiré: quando a célula fica menor que alguns pixels (longe), a grade se dissolve
+      float lod = 1.0 - smoothstep(0.06, 0.22, max(w.x, w.y));
+      float d = length(vWorld.xz);
       float fade = exp(-max(-vWorld.z, 0.0) * 0.045) * smoothstep(26.0, 6.0, abs(vWorld.x));
-      fade *= smoothstep(18.0, 4.0, vWorld.z);
-      vec3 col = mix(cViolet, cMagenta, smoothstep(30.0, 0.0, dist)) * line * fade * 0.55;
+      fade *= smoothstep(18.0, 4.0, vWorld.z) * lod;
+      vec3 col = mix(cViolet, cMagenta, smoothstep(30.0, 0.0, d)) * (core * 0.42 + halo) * fade;
       gl_FragColor = vec4(col, 1.0);
+    }
+  `,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false,
+  extensions: { derivatives: true },
+});
+
+/* Anel desenhado por função de distância num plano: borda antisserrilhada em qualquer espessura
+   (substitui geometria fina demais, que ficava pontilhada). Um brilho percorre o anel. */
+const ringMaterial = (palette, { radius, width, intensity = 1, speed = 0.3, phase = 0 }) => new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: { value: 0 }, uIntensity: { value: intensity },
+    cViolet: { value: palette.violet }, cMagenta: { value: palette.magenta }, cOff: { value: palette.offwhite },
+  },
+  vertexShader: 'varying vec2 vP; void main() { vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: /* glsl */ `
+    uniform float uTime, uIntensity;
+    uniform vec3 cViolet, cMagenta, cOff;
+    varying vec2 vP;
+    void main() {
+      float r = length(vP);
+      float d = abs(r - ${radius.toFixed(3)});
+      float fw = fwidth(r);
+      float core = 1.0 - smoothstep(${(width / 2).toFixed(4)}, ${(width / 2).toFixed(4)} + fw * 1.5, d);
+      float halo = exp(-d / (${width.toFixed(4)} * 2.0 + fw * 1.5)) * 0.22;
+      float a = atan(vP.y, vP.x);
+      float sweep = pow(0.5 + 0.5 * cos(a - uTime * ${speed.toFixed(3)} - ${phase.toFixed(3)}), 6.0);
+      vec3 col = mix(cViolet, cMagenta, 0.35 + 0.65 * sweep) * (core * 0.9 + halo) + cOff * core * sweep * 0.5;
+      gl_FragColor = vec4(col * uIntensity, 1.0);
     }
   `,
   transparent: true,
@@ -85,9 +118,12 @@ class FinaleScene {
 
     this.build();
 
-    this.composer = new EffectComposer(this.renderer);
+    // Pós-processamento com multisampling 4x (o antialias nativo não se aplica ao composer)
+    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: this.renderer.capabilities.isWebGL2 ? 4 : 0 });
+    this.composer = new EffectComposer(this.renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.composer.addPass(new UnrealBloomPass(new THREE.Vector2(256, 256), 0.9, 0.55, 0.35));
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.85, 0.5, 0.38);
+    this.composer.addPass(this.bloom);
 
     new ResizeObserver(() => this.resize()).observe(visual);
     this.resize();
@@ -109,10 +145,7 @@ class FinaleScene {
     this.scene.add(this.portal);
 
     // Anel interno fino, girando em outro eixo (sensação de mecanismo)
-    this.inner = new THREE.Mesh(
-      createRibbonGeometry(circle(4.5), { segments: 360, radial: 16, width: 0.05, thickness: 0.03, closed: true }),
-      this.glass({ intensity: 0.45, hue: 2, sweep: 2.4 }),
-    );
+    this.inner = new THREE.Mesh(new THREE.PlaneGeometry(9.6, 9.6), ringMaterial(this.palette, { radius: 4.5, width: 0.035, intensity: 0.55, speed: 0.5 }));
     this.inner.position.copy(this.portal.position);
     this.scene.add(this.inner);
 
@@ -123,10 +156,9 @@ class FinaleScene {
 
     // Túnel: anéis finos que se afastam no horizonte e avançam com a rolagem
     this.tunnel = [];
-    const ringGeo = createRibbonGeometry(circle(5.2, 96), { segments: 200, radial: 10, width: 0.035, thickness: 0.02, closed: true });
+    const ringGeo = new THREE.PlaneGeometry(11, 11);
     for (let i = 0; i < 10; i++) {
-      const m = this.glass({ intensity: 0.5, hue: i * 0.6, sweep: 1.8 });
-      const ring = new THREE.Mesh(ringGeo, m);
+      const ring = new THREE.Mesh(ringGeo, ringMaterial(this.palette, { radius: 5.2, width: 0.022, intensity: 0.38, speed: 0.25, phase: i * 0.9 }));
       ring.position.set(0, 0.35, -3 - i * 3.2);
       this.tunnel.push(ring);
       this.scene.add(ring);
@@ -143,7 +175,7 @@ class FinaleScene {
   resize() {
     const { clientWidth: w, clientHeight: h } = visual;
     if (!w || !h) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, w < 700 ? 1.5 : 1.75);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(dpr);
@@ -179,10 +211,13 @@ class FinaleScene {
       ring.position.z = z0;
       const s = 1 + Math.sin(i + t * 0.2) * 0.03;
       ring.scale.setScalar(s);
-      ring.material.uniforms.uIntensity.value = 0.55 * THREE.MathUtils.smoothstep(-z0, 2.5, 6) * THREE.MathUtils.smoothstep(34 + z0, 0, 10);
+      // Entra suave perto do portal e some cedo na distância (o centro, atrás do texto, fica limpo)
+      ring.material.uniforms.uIntensity.value = 0.3 * THREE.MathUtils.smoothstep(-z0, 2.5, 6) * (1 - THREE.MathUtils.smoothstep(-z0, 7, 18));
     });
     this.gridMat.uniforms.uFlow.value = flow * 0.6;
     this.glow.material.uniforms.uTime.value = t;
+    this.inner.material.uniforms.uTime.value = t;
+    this.tunnel.forEach((ring) => { ring.material.uniforms.uTime.value = t; });
     for (const m of this.materials) m.uniforms.uTime.value = t;
   }
 
