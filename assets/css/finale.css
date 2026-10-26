@@ -1,0 +1,90 @@
+/* 7ª dobra — chamada final: portal de vidro 3D, túnel de anéis e grade em perspectiva */
+.finale {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  align-items: center;
+  min-height: max(100svh, 760px);
+  padding: clamp(120px, 14vw, 180px) 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.finale__visual {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  /* Base caso o WebGL não esteja disponível */
+  background:
+    radial-gradient(circle at 50% 46%, rgba(197,26,216,.32), transparent 34%),
+    radial-gradient(ellipse 60% 40% at 50% 80%, rgba(139,42,194,.25), transparent 70%),
+    #000;
+}
+.finale__canvas {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1600ms cubic-bezier(.2,.7,.2,1);
+}
+.finale__visual.is-ready .finale__canvas { opacity: 1; }
+
+/* Véu: funde com a dobra anterior e garante leitura no centro */
+.finale__veil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, #000 0%, transparent 22%, transparent 82%, #000 100%),
+    radial-gradient(ellipse 46% 34% at 50% 50%, rgba(0,0,0,.7), transparent 78%);
+}
+
+.finale__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.finale__title {
+  max-width: 17em;
+  margin: 0;
+  font-size: clamp(36px, 5.2vw, 80px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -.055em;
+  text-wrap: balance;
+  text-shadow: 0 8px 40px rgba(0,0,0,.6);
+}
+.finale__title .grad-text { padding-right: .04em; }
+.finale__lead {
+  max-width: 600px;
+  margin: var(--space-8) 0 0;
+  color: #C9C0D0;
+  font-size: clamp(15px, 1.3vw, 18px);
+  line-height: 1.75;
+  text-shadow: 0 2px 20px rgba(0,0,0,.8);
+}
+.finale__actions { margin-top: var(--space-12); }
+
+/* CTA principal com aura pulsante (sombra animada: não vaza o brilho interno do botão) */
+.finale__cta {
+  --btn-pad-y: 22px;
+  --btn-pad-x: 36px;
+  min-height: 64px;
+  font-size: 13px;
+  animation: finale-aura 2.6s ease-out infinite;
+}
+.finale__cta:hover { animation: none; box-shadow: 0 0 60px rgba(197,26,216,.6); }
+
+@keyframes finale-aura {
+  0% { box-shadow: 0 0 0 0 rgba(197,26,216,.55), 0 0 40px rgba(197,26,216,.35); }
+  100% { box-shadow: 0 0 0 22px rgba(197,26,216,0), 0 0 40px rgba(197,26,216,.35); }
+}
+
+@media (max-width: 650px) {
+  .finale__cta { width: 100%; --btn-pad-x: 16px; font-size: var(--text-xs); letter-spacing: .06em; }
+  .finale__actions { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .finale__cta { animation: none; box-shadow: 0 0 40px rgba(197,26,216,.35); }
+}

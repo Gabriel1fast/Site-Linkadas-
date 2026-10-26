@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="assets/css/founders.css">
   <link rel="stylesheet" href="assets/css/manifesto.css">
   <link rel="stylesheet" href="assets/css/approach.css">
+  <link rel="stylesheet" href="assets/css/finale.css">
 
   <script type="importmap">
     {
@@ -524,6 +525,28 @@
         </ul>
       </div>
     </section>
+
+    <!-- 7ª dobra: chamada final (portal de luz 3D) -->
+    <section class="finale" id="diagnostico" aria-labelledby="finale-title" data-finale>
+      <div class="finale__visual" data-finale-visual aria-hidden="true">
+        <canvas class="finale__canvas" data-finale-canvas></canvas>
+      </div>
+      <div class="finale__veil" aria-hidden="true"></div>
+
+      <div class="container finale__content">
+        <h2 class="finale__title reveal-scroll" id="finale-title" style="--reveal-order:0">
+          O próximo movimento da sua empresa começa com uma <span class="grad-text">decisão bem fundamentada.</span>
+        </h2>
+        <p class="finale__lead reveal-scroll" style="--reveal-order:1">
+          Apresente-nos seu cenário. Nossa equipe avaliará as oportunidades e indicará como estruturar uma atuação alinhada às prioridades do seu negócio.
+        </p>
+        <div class="finale__actions reveal-scroll" style="--reveal-order:2">
+          <a class="btn btn-primary btn-lg finale__cta" href="#diagnostico" data-cta data-finale-cta>
+            Agendar diagnóstico estratégico <span class="btn__icon" aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="assets/js/main.js" defer></script>
@@ -534,5 +557,6 @@
   <script type="module" src="assets/js/results-gradient.js"></script>
   <script type="module" src="assets/js/presence.js"></script>
   <script type="module" src="assets/js/approach.js"></script>
+  <script type="module" src="assets/js/finale.js"></script>
 </body>
 </html>
