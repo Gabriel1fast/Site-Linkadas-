@@ -21,23 +21,15 @@
 }
 
 /* Papel premium: grão + curvas de nível + luz lavanda atrás do mapa */
+/* Papel pontilhado (grade de pontos com 50% de opacidade) */
 .presence__paper {
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 45% 50% at 62% 48%, rgba(139,42,194,.10), transparent 70%),
-    url("../img/presence/topo-lines.svg") center / cover no-repeat;
-  opacity: .42;
-}
-.presence__paper::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  opacity: .35;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .25 0 0 0 0 .22 0 0 0 0 .34 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-image: radial-gradient(circle, rgba(24,7,43,.5) 1.1px, transparent 1.5px);
+  background-size: 35px 35px;
+  background-position: center top;
 }
 
 .presence__inner {
@@ -201,8 +193,8 @@
   transform-origin: 50% 60%;
 }
 .pr-side { fill: url(#pr-side); opacity: .9; }
-.pr-top { fill: #E4D8EE; }
-.pr-relief { opacity: .7; mix-blend-mode: multiply; }
+.pr-top { fill: url(#pr-top); }
+.pr-relief { opacity: .32; mix-blend-mode: multiply; }
 .pr-outline {
   fill: none;
   stroke: var(--color-purple-deep);
@@ -214,8 +206,8 @@
 /* Fronteiras estaduais desenhadas progressivamente */
 .pr-state {
   fill: rgba(139,42,194,0);
-  stroke: rgba(139,42,194,.6);
-  stroke-width: .8;
+  stroke: rgba(245,239,232,.75);
+  stroke-width: .9;
   stroke-linejoin: round;
   stroke-dasharray: 1;
   stroke-dashoffset: calc(1 - var(--p-borders));
@@ -223,7 +215,7 @@
   transition: fill 220ms ease, stroke 220ms ease;
 }
 .pr-state:hover,
-.pr-state.is-active { fill: rgba(139,42,194,.2); stroke: var(--color-magenta); stroke-width: 1.2; }
+.pr-state.is-active { fill: rgba(197,26,216,.35); stroke: var(--color-magenta); stroke-width: 1.2; }
 
 /* Conexões */
 .pr-link,
@@ -267,11 +259,11 @@
   cursor: pointer;
   outline: none;
 }
-.pr-country__top { fill: #E4D8EE; stroke: var(--color-purple-deep); stroke-width: .9; stroke-linejoin: round; transition: fill 220ms ease; }
+.pr-country__top { fill: url(#pr-top); stroke: var(--color-purple-deep); stroke-width: .9; stroke-linejoin: round; transition: fill 220ms ease; }
 .pr-country__side { fill: url(#pr-side); opacity: .85; }
 .pr-country:hover .pr-country__top,
 .pr-country.is-active .pr-country__top,
-.pr-country:focus-visible .pr-country__top { fill: #D6C2EA; }
+.pr-country:focus-visible .pr-country__top { fill: var(--color-magenta); }
 
 .presence__labels { position: absolute; inset: 0; pointer-events: none; }
 .presence__label {
@@ -408,3 +400,7 @@
   .presence { --p-map: 1; --p-borders: 1; --p-points: 1; --p-links: 1; --p-abroad: 1; }
   .pr-point__pulse { animation: none !important; }
 }
+
+/* Sobre o mapa roxo, conexões internas em off-white para manter o contraste */
+.pr-links .pr-link { stroke: var(--color-offwhite); stroke-width: 1.4; }
+.pr-links .pr-link-glow { stroke: var(--color-offwhite); opacity: .22; }

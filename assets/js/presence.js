@@ -63,6 +63,9 @@ function build() {
     <linearGradient id="pr-side" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#8B2AC2"/><stop offset="1" stop-color="#18072B"/>
     </linearGradient>
+    <linearGradient id="pr-top" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#A55BD6"/><stop offset=".55" stop-color="#B84BD9"/><stop offset="1" stop-color="#D36BE3"/>
+    </linearGradient>
     <linearGradient id="pr-link" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#C51AD8"/><stop offset="1" stop-color="#8B2AC2"/>
     </linearGradient>
