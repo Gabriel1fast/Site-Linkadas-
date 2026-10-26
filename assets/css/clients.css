@@ -42,6 +42,30 @@
 .clients__band::before { top: 0; }
 .clients__band::after { bottom: 0; }
 
+.clients__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin: 0 0 clamp(8px, 1.2vw, 14px);
+  padding-inline: var(--space-6);
+  color: var(--color-text);
+  font-size: clamp(14px, 1.2vw, 17px);
+  font-weight: 600;
+  letter-spacing: -.01em;
+  text-align: center;
+}
+/* Filetes laterais com o gradiente da marca */
+.clients__title::before,
+.clients__title::after {
+  content: "";
+  flex: none;
+  width: clamp(24px, 4vw, 56px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-magenta));
+}
+.clients__title::after { transform: scaleX(-1); }
+
 .clients__track {
   display: flex;
   align-items: center;
