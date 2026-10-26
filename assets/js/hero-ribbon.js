@@ -35,9 +35,11 @@ class GlassRibbonScene {
     this.materials = [];
     this.buildShapes();
 
-    this.composer = new EffectComposer(this.renderer);
+    // Pós-processamento com multisampling 4x (o antialias nativo não se aplica ao composer)
+    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: this.renderer.capabilities.isWebGL2 ? 4 : 0 });
+    this.composer = new EffectComposer(this.renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.8, 0.5, 0.4);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.75, 0.5, 0.42);
     this.composer.addPass(this.bloom);
 
     this.onResize = this.onResize.bind(this);
@@ -75,7 +77,7 @@ class GlassRibbonScene {
     }
     const ringCurve = new THREE.CatmullRomCurve3(ringPoints, true, 'centripetal');
     const ring = new THREE.Mesh(
-      createRibbonGeometry(ringCurve, { segments: 320, radial: 32, width: 0.62, thickness: 0.09, closed: true, twist: () => Math.PI / 2 + 0.25 }),
+      createRibbonGeometry(ringCurve, { segments: 640, radial: 48, width: 0.62, thickness: 0.09, closed: true, twist: () => Math.PI / 2 + 0.25 }),
       this.createMaterial({ intensity: 0.95, hue: 1.4, sweep: 0.8, wave: 0.6 }),
     );
     ring.rotation.set(0.5, 0.18, -0.16);
@@ -95,8 +97,8 @@ class GlassRibbonScene {
     ], false, 'centripetal');
     const ribbon = new THREE.Mesh(
       createRibbonGeometry(ribbonCurve, {
-        segments: 520,
-        radial: 40,
+        segments: 1000,
+        radial: 56,
         width: 1.25,
         thickness: 0.13,
         twist: (u) => 0.35 + u * Math.PI * 1.65,
@@ -112,7 +114,7 @@ class GlassRibbonScene {
       'centripetal',
     );
     const thread = new THREE.Mesh(
-      createRibbonGeometry(threadCurve, { segments: 420, radial: 20, width: 0.14, thickness: 0.06, twist: (u) => u * 4 }),
+      createRibbonGeometry(threadCurve, { segments: 800, radial: 24, width: 0.14, thickness: 0.06, twist: (u) => u * 4 }),
       this.createMaterial({ intensity: 0.7, hue: 2.4, sweep: 1.4 }),
     );
     this.group.add(thread);
@@ -125,7 +127,7 @@ class GlassRibbonScene {
   onResize() {
     const { clientWidth: w, clientHeight: h } = this.container;
     if (!w || !h) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, w < 700 ? 1.5 : 1.75);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(dpr);
