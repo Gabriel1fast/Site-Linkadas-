@@ -47,85 +47,88 @@
 
   <main>
     <!-- Hero -->
-    <section class="hero" id="inicio" aria-labelledby="hero-title">
-      <div class="hero__ambient" aria-hidden="true"></div>
-      <div class="hero__grid" aria-hidden="true"></div>
-      <div class="hero__visual" data-hero-visual aria-hidden="true">
-        <div class="hero__fallback"></div>
-        <canvas class="hero__canvas" data-hero-canvas></canvas>
-      </div>
-      <div class="hero__veil" aria-hidden="true"></div>
-
-      <div class="container hero__content">
-        <p class="badge-split reveal" style="--reveal-order:0">
-          <span class="badge-split__chip">Linkadas</span>
-          <span class="badge-split__label">Business Growth &amp; Marketing</span>
-        </p>
-
-        <h1 class="hero__title reveal" id="hero-title" style="--reveal-order:1">
-          Sua próxima fase de crescimento exige uma <span class="grad-text">operação à&nbsp;altura.</span>
-        </h1>
-
-        <p class="hero__lead reveal" style="--reveal-order:2">
-          Estratégia, implantação comercial e performance integradas para empresas que valorizam eficiência, inteligência de mercado e resultados mensuráveis.
-        </p>
-
-        <div class="hero__actions reveal" style="--reveal-order:3" data-hero-anchor>
-          <a class="btn btn-primary btn-lg" href="#diagnostico" data-cta>
-            Solicitar diagnóstico estratégico <span class="btn__icon" aria-hidden="true">↗</span>
-          </a>
+    <!-- Hero + faixa de clientes: presos juntos enquanto as logos passam -->
+    <div class="fold-stack" data-fold-stack>
+      <section class="hero" id="inicio" aria-labelledby="hero-title">
+        <div class="hero__ambient" aria-hidden="true"></div>
+        <div class="hero__grid" aria-hidden="true"></div>
+        <div class="hero__visual" data-hero-visual aria-hidden="true">
+          <div class="hero__fallback"></div>
+          <canvas class="hero__canvas" data-hero-canvas></canvas>
         </div>
-      </div>
-    </section>
+        <div class="hero__veil" aria-hidden="true"></div>
 
-    <!-- Clientes: faixa de logos guiada pela rolagem -->
-    <section class="clients is-static" aria-label="Empresas clientes" data-clients>
-      <div class="clients__pin">
-        <div class="clients__band">
-          <ul class="clients__track" data-clients-track>
-          <li class="clients__item" style="--k:0.77" data-client>
-            <img src="assets/img/clients/01-bodytech.webp" alt="Bodytech" width="556" height="206" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:1.00" data-client>
-            <img src="assets/img/clients/02-b3.webp" alt="B3" width="224" height="192" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:0.98" data-client>
-            <img src="assets/img/clients/03-diroma613.webp" alt="DiRoma 613" width="321" height="194" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:0.94" data-client>
-            <img src="assets/img/clients/04-ultra-academia.webp" alt="Ultra Academia" width="366" height="202" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:0.85" data-client>
-            <img src="assets/img/clients/05-belt.webp" alt="Belt — Brazil Executive Luxury Transportation" width="376" height="168" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:0.93" data-client>
-            <img src="assets/img/clients/06-action-360.webp" alt="Action 360" width="388" height="208" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:0.61" data-client>
-            <img src="assets/img/clients/07-grupo-innsbruck.webp" alt="Grupo Innsbruck" width="625" height="145" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:1.00" data-client>
-            <img src="assets/img/clients/08-grupo-foccus.webp" alt="Grupo Foccus" width="244" height="194" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:1.00" data-client>
-            <img src="assets/img/clients/09-prime-foccus.webp" alt="Prime Foccus Tecnologia" width="158" height="190" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:1.00" data-client>
-            <img src="assets/img/clients/10-emporio-pata-negra.webp" alt="Empório Pata Negra" width="213" height="217" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:1.00" data-client>
-            <img src="assets/img/clients/11-two-ases-gym.webp" alt="Two Ases Gym" width="279" height="240" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:0.96" data-client>
-            <img src="assets/img/clients/12-studio-ph-anderson.webp" alt="Studio PH Anderson" width="282" height="161" decoding="async">
-          </li>
-          <li class="clients__item" style="--k:0.96" data-client>
-            <img src="assets/img/clients/13-academia-gavioes.webp" alt="Academia Gaviões 24 horas" width="365" height="212" decoding="async">
-          </li>
-          </ul>
+        <div class="container hero__content">
+          <p class="badge-split reveal" style="--reveal-order:0">
+            <span class="badge-split__chip">Linkadas</span>
+            <span class="badge-split__label">Business Growth &amp; Marketing</span>
+          </p>
+
+          <h1 class="hero__title reveal" id="hero-title" style="--reveal-order:1">
+            Sua próxima fase de crescimento exige uma <span class="grad-text">operação à&nbsp;altura.</span>
+          </h1>
+
+          <p class="hero__lead reveal" style="--reveal-order:2">
+            Estratégia, implantação comercial e performance integradas para empresas que valorizam eficiência, inteligência de mercado e resultados mensuráveis.
+          </p>
+
+          <div class="hero__actions reveal" style="--reveal-order:3" data-hero-anchor>
+            <a class="btn btn-primary btn-lg" href="#diagnostico" data-cta>
+              Solicitar diagnóstico estratégico <span class="btn__icon" aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <!-- Clientes: faixa de logos guiada pela rolagem -->
+      <section class="clients is-static" aria-label="Empresas clientes" data-clients>
+        <div class="clients__pin">
+          <div class="clients__band">
+            <ul class="clients__track" data-clients-track>
+            <li class="clients__item" style="--k:0.77" data-client>
+              <img src="assets/img/clients/01-bodytech.webp" alt="Bodytech" width="556" height="206" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:1.00" data-client>
+              <img src="assets/img/clients/02-b3.webp" alt="B3" width="224" height="192" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:0.98" data-client>
+              <img src="assets/img/clients/03-diroma613.webp" alt="DiRoma 613" width="321" height="194" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:0.94" data-client>
+              <img src="assets/img/clients/04-ultra-academia.webp" alt="Ultra Academia" width="366" height="202" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:0.85" data-client>
+              <img src="assets/img/clients/05-belt.webp" alt="Belt — Brazil Executive Luxury Transportation" width="376" height="168" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:0.93" data-client>
+              <img src="assets/img/clients/06-action-360.webp" alt="Action 360" width="388" height="208" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:0.61" data-client>
+              <img src="assets/img/clients/07-grupo-innsbruck.webp" alt="Grupo Innsbruck" width="625" height="145" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:1.00" data-client>
+              <img src="assets/img/clients/08-grupo-foccus.webp" alt="Grupo Foccus" width="244" height="194" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:1.00" data-client>
+              <img src="assets/img/clients/09-prime-foccus.webp" alt="Prime Foccus Tecnologia" width="158" height="190" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:1.00" data-client>
+              <img src="assets/img/clients/10-emporio-pata-negra.webp" alt="Empório Pata Negra" width="213" height="217" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:1.00" data-client>
+              <img src="assets/img/clients/11-two-ases-gym.webp" alt="Two Ases Gym" width="279" height="240" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:0.96" data-client>
+              <img src="assets/img/clients/12-studio-ph-anderson.webp" alt="Studio PH Anderson" width="282" height="161" decoding="async">
+            </li>
+            <li class="clients__item" style="--k:0.96" data-client>
+              <img src="assets/img/clients/13-academia-gavioes.webp" alt="Academia Gaviões 24 horas" width="365" height="212" decoding="async">
+            </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
 
     <!-- Resultados (track record / cases de sucesso) -->
     <section class="results" id="resultados" aria-labelledby="results-title">

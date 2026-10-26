@@ -1,36 +1,33 @@
-/* Clientes — faixa de logos entre a Hero e os Cases.
-   A seção fica fixa na tela enquanto a rolagem vertical move as logos da direita para a esquerda. */
+/* Clientes — faixa de logos colada entre a Hero e os Cases.
+   Enquanto as logos passam, a Hero e a faixa ficam presas juntas (faixa na base da tela);
+   ao terminar, seguem juntas e os Cases entram colados logo abaixo. */
 .clients {
-  --logo-h: clamp(30px, 3.6vw, 52px);
-  --gap: clamp(48px, 7vw, 112px);
+  --logo-h: clamp(48px, 5.8vw, 84px);
+  --gap: clamp(64px, 9vw, 144px);
   position: relative;
-  /* Altura real definida via JS (viewport + percurso da faixa); este é o valor sem JS */
-  height: auto;
-  background: var(--color-bg);
+  /* Transparente: a área acima da faixa deixa ver a Hero presa por trás */
   overflow-x: clip;
 }
 
+/* A faixa em si; o JS a fixa na base da viewport durante o percurso */
 .clients__pin {
   position: sticky;
-  top: 0;
-  display: grid;
-  align-items: center;
-  height: 100vh;
-  height: 100svh;
+  top: calc(100vh - var(--band-h, 0px));
   overflow: hidden;
 }
-/* Luz ambiente discreta no centro, onde a logo fica em destaque */
-.clients__pin::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse 28% 22% at 50% 50%, rgba(139,42,194,.16), transparent 70%);
+
+/* Com o percurso ativo, a Hero também fica presa, mostrando sua base logo acima da faixa */
+.fold-stack.is-pinned > .hero {
+  position: sticky;
+  top: var(--hero-stick, 0px);
 }
 
 .clients__band {
   position: relative;
-  padding-block: clamp(28px, 4vw, 44px);
+  padding-block: clamp(16px, 2vw, 24px);
+  background:
+    radial-gradient(ellipse 30% 90% at 50% 50%, rgba(139,42,194,.16), transparent 70%),
+    var(--color-bg);
 }
 /* Filetes superior e inferior: mais visíveis no centro, somem nas laterais */
 .clients__band::before,
@@ -50,7 +47,7 @@
   align-items: center;
   gap: var(--gap);
   width: max-content;
-  height: calc(var(--logo-h) * 1.25);
+  height: calc(var(--logo-h) * 1.2);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -73,19 +70,18 @@
 }
 
 @media (max-width: 650px) {
-  .clients { --logo-h: 34px; --gap: 44px; }
+  .clients { --logo-h: 54px; --gap: 56px; }
 }
 
 /* Sem JS ou com movimento reduzido: faixa estática, todas as logos visíveis */
-.clients.is-static { height: auto; }
-.clients.is-static .clients__pin { position: relative; height: auto; padding-block: var(--space-16); }
+.clients.is-static .clients__pin { position: relative; top: auto; }
 .clients.is-static .clients__track {
   flex-wrap: wrap;
   justify-content: center;
   width: auto;
   height: auto;
-  row-gap: var(--space-8);
+  row-gap: var(--space-6);
   padding-inline: var(--space-6);
   transform: none;
 }
-.clients.is-static .clients__item { opacity: .85; transform: scale(.8); }
+.clients.is-static .clients__item { opacity: .85; transform: scale(.7); }
