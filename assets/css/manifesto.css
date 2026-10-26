@@ -22,13 +22,14 @@
 .manifesto__text {
   max-width: 21em;
   margin: 0 auto;
-  font-size: clamp(32px, 4.6vw, 68px);
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -.045em;
+  font-size: clamp(24px, 3.5vw, 52px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.02em;
   text-align: center;
   text-wrap: balance;
   color: var(--color-text);
+  text-transform: uppercase;
 }
 .manifesto__text em { font-style: normal; color: #E388EF; }
 

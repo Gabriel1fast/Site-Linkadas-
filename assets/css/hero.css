@@ -88,11 +88,12 @@
 .hero__title {
   max-width: 15em;
   margin: var(--space-8) 0 0;
-  font-size: clamp(38px, 4.6vw, 68px);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -.045em;
+  font-size: clamp(30px, 3.9vw, 56px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.02em;
   text-wrap: balance;
+  text-transform: uppercase;
 }
 .hero__title .grad-text { padding-right: .04em; }
 
@@ -127,7 +128,7 @@
 @media (max-width: 650px) {
   .hero { min-height: max(100svh, 720px); }
   .hero__content { padding-top: 120px; }
-  .hero__title { letter-spacing: -.05em; }
+  .hero__title { letter-spacing: -.015em; }
   .hero__actions { width: 100%; }
   .hero__actions .btn { --btn-pad-x: 16px; width: 100%; font-size: var(--text-xs); letter-spacing: .06em; }
   .badge-split { font-size: 9px; letter-spacing: .1em; }

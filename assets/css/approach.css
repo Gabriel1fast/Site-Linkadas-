@@ -75,11 +75,12 @@
 }
 .approach__title {
   margin: var(--space-6) 0 0;
-  font-size: clamp(38px, 4.6vw, 68px);
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -.05em;
+  font-size: clamp(30px, 3.8vw, 54px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.02em;
   text-wrap: balance;
+  text-transform: uppercase;
 }
 .approach__title .grad-text { padding-right: .04em; }
 .approach__rule {

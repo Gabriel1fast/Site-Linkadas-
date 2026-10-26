@@ -120,10 +120,11 @@
 }
 .founder__name {
   margin: 0;
-  font-size: clamp(32px, 3.4vw, 48px);
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -.05em;
+  font-size: clamp(24px, 2.5vw, 36px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.02em;
+  text-transform: uppercase;
 }
 .founder__role {
   margin: var(--space-4) 0 0;
@@ -178,11 +179,12 @@
 .founders__statement {
   max-width: 18em;
   margin: 0;
-  font-size: clamp(30px, 3.8vw, 56px);
-  font-weight: 700;
+  font-size: clamp(24px, 3.1vw, 44px);
+  font-weight: 600;
   line-height: 1.08;
-  letter-spacing: -.045em;
+  letter-spacing: -.02em;
   text-wrap: balance;
+  text-transform: uppercase;
 }
 .founders__statement .grad-text { padding-right: .04em; }
 

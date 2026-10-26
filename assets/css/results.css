@@ -71,11 +71,12 @@
 }
 .results__title {
   margin: var(--space-8) 0 0;
-  font-size: clamp(40px, 5vw, 72px);
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -.05em;
+  font-size: clamp(32px, 4.1vw, 58px);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -.02em;
   text-wrap: balance;
+  text-transform: uppercase;
 }
 .results__title .grad-text { padding-right: .04em; }
 .results__lead {
