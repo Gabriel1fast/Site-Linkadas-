@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="assets/css/hero.css">
   <link rel="stylesheet" href="assets/css/clients.css">
   <link rel="stylesheet" href="assets/css/results.css">
+  <link rel="stylesheet" href="assets/css/presence.css">
 
   <script type="importmap">
     {
@@ -293,6 +294,84 @@
         </div>
       </div>
     </section>
+    <!-- Presença (where we operate) -->
+    <section class="presence" id="presenca" aria-labelledby="presence-title" data-presence>
+      <div class="presence__paper" aria-hidden="true"></div>
+
+      <div class="container presence__inner">
+        <div class="presence__intro">
+          <p class="presence__eyebrow reveal-scroll" style="--reveal-order:0">Where We Operate</p>
+          <h2 class="presence__title reveal-scroll" id="presence-title" style="--reveal-order:1">
+            Presença que ultrapassa <span class="presence__grad">fronteiras.</span>
+          </h2>
+          <span class="presence__rule reveal-scroll" style="--reveal-order:2" aria-hidden="true"></span>
+          <p class="presence__lead reveal-scroll" style="--reveal-order:2">
+            A Linkadas já atendeu clientes e realizou produções em 11 locais no Brasil e em 3 países no exterior.
+          </p>
+
+          <dl class="presence__stats reveal-scroll" style="--reveal-order:3">
+            <div class="presence__stat"><dt class="visually-hidden">Brasil</dt><dd><strong>11</strong> <span>locais no Brasil</span></dd></div>
+            <div class="presence__stat"><dt class="visually-hidden">Exterior</dt><dd><strong>3</strong> <span>países no exterior</span></dd></div>
+          </dl>
+
+          <div class="presence__places reveal-scroll" style="--reveal-order:4">
+            <p class="presence__places-title">11 locais no Brasil</p>
+            <ul class="presence__list">
+                <li><button type="button" class="presence__place" data-location="sao-paulo">São Paulo</button></li>
+                <li><button type="button" class="presence__place" data-location="franca">Franca</button></li>
+                <li><button type="button" class="presence__place" data-location="belo-horizonte">Belo Horizonte</button></li>
+                <li><button type="button" class="presence__place" data-location="natal">Natal</button></li>
+                <li><button type="button" class="presence__place" data-location="joao-pessoa">João Pessoa</button></li>
+                <li><button type="button" class="presence__place" data-location="joinville">Joinville</button></li>
+                <li><button type="button" class="presence__place" data-location="blumenau">Blumenau</button></li>
+                <li><button type="button" class="presence__place" data-location="caldas-novas">Caldas Novas</button></li>
+                <li><button type="button" class="presence__place" data-location="cascavel">Cascavel</button></li>
+                <li><button type="button" class="presence__place" data-location="espirito-santo">Espírito Santo</button></li>
+                <li><button type="button" class="presence__place" data-location="bahia">Bahia</button></li>
+            </ul>
+          </div>
+
+          <svg class="presence__compass reveal-scroll" style="--reveal-order:5" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width=".6"/>
+            <circle cx="50" cy="50" r="22" fill="none" stroke="currentColor" stroke-width=".4" stroke-dasharray="1.5 2.5"/>
+            <path d="M50 12 L54 46 L50 50 L46 46 Z" fill="currentColor"/>
+            <path d="M50 88 L54 54 L50 50 L46 54 Z" fill="none" stroke="currentColor" stroke-width=".6"/>
+            <path d="M12 50 L46 46 L50 50 L46 54 Z" fill="none" stroke="currentColor" stroke-width=".6"/>
+            <path d="M88 50 L54 46 L50 50 L54 54 Z" fill="none" stroke="currentColor" stroke-width=".6"/>
+            <text x="50" y="7" text-anchor="middle">N</text><text x="50" y="99" text-anchor="middle">S</text>
+            <text x="3" y="53" text-anchor="middle">O</text><text x="97" y="53" text-anchor="middle">L</text>
+          </svg>
+        </div>
+
+        <div class="presence__stage" data-presence-stage>
+          <!-- O mapa é montado por assets/js/presence.js a partir de assets/js/presence-map-data.js -->
+          <svg class="presence__map" data-presence-map role="img" aria-label="Mapa do Brasil com os 11 locais atendidos e conexões com Chile, Estados Unidos e Suécia"></svg>
+          <div class="presence__labels" data-presence-labels></div>
+          <div class="presence__tooltip" data-presence-tooltip role="status" aria-live="polite"></div>
+          <p class="presence__source">Fonte cartográfica: IBGE (Malha Municipal 2022) e Natural Earth.</p>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="presence__brands">
+          <p class="presence__brands-title reveal-scroll">Marcas que já confiaram</p>
+          <ul class="presence__brand-list">
+            <li class="presence__brand reveal-scroll" style="--reveal-order:0">B3</li>
+            <li class="presence__brand-sep" aria-hidden="true">/</li>
+            <li class="presence__brand reveal-scroll" style="--reveal-order:1">Bodytech</li>
+            <li class="presence__brand-sep" aria-hidden="true">/</li>
+            <li class="presence__brand reveal-scroll" style="--reveal-order:2">Action 360</li>
+            <li class="presence__brand-sep" aria-hidden="true">/</li>
+            <li class="presence__brand reveal-scroll" style="--reveal-order:3">Academia Gaviões</li>
+            <li class="presence__brand-sep" aria-hidden="true">/</li>
+            <li class="presence__brand reveal-scroll" style="--reveal-order:4">Ultra Academia</li>
+            <li class="presence__brand-sep" aria-hidden="true">/</li>
+            <li class="presence__brand reveal-scroll" style="--reveal-order:5">Grupo Foccus</li>
+          </ul>
+          <p class="presence__brands-note reveal-scroll" style="--reveal-order:6">E outras marcas que fazem parte da nossa trajetória.</p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <script src="assets/js/main.js" defer></script>
@@ -300,5 +379,6 @@
   <script src="assets/js/results.js" defer></script>
   <script type="module" src="assets/js/hero-ribbon.js"></script>
   <script type="module" src="assets/js/results-gradient.js"></script>
+  <script type="module" src="assets/js/presence.js"></script>
 </body>
 </html>

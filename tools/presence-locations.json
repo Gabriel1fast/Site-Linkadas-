@@ -1,0 +1,21 @@
+{
+  "_doc": "Locais atendidos (copy: 11 locais no Brasil). kind 'cidade' usa coordenadas da sede municipal; kind 'estado' usa o ponto de referência do IBGE para a UF. Após editar, rode: cd tools && npm install && npm run build:map",
+  "brasil": [
+    { "id": "sao-paulo",      "name": "São Paulo",      "uf": "SP", "kind": "cidade", "lat": -23.5505, "lon": -46.6333 },
+    { "id": "franca",         "name": "Franca",         "uf": "SP", "kind": "cidade", "lat": -20.5352, "lon": -47.4039 },
+    { "id": "belo-horizonte", "name": "Belo Horizonte", "uf": "MG", "kind": "cidade", "lat": -19.9191, "lon": -43.9386 },
+    { "id": "natal",          "name": "Natal",          "uf": "RN", "kind": "cidade", "lat": -5.7945,  "lon": -35.2110 },
+    { "id": "joao-pessoa",    "name": "João Pessoa",    "uf": "PB", "kind": "cidade", "lat": -7.1153,  "lon": -34.8610 },
+    { "id": "joinville",      "name": "Joinville",      "uf": "SC", "kind": "cidade", "lat": -26.3045, "lon": -48.8487 },
+    { "id": "blumenau",       "name": "Blumenau",       "uf": "SC", "kind": "cidade", "lat": -26.9155, "lon": -49.0709 },
+    { "id": "caldas-novas",   "name": "Caldas Novas",   "uf": "GO", "kind": "cidade", "lat": -17.7441, "lon": -48.6250 },
+    { "id": "cascavel",       "name": "Cascavel",       "uf": "PR", "kind": "cidade", "lat": -24.9573, "lon": -53.4590 },
+    { "id": "espirito-santo", "name": "Espírito Santo", "uf": "ES", "kind": "estado" },
+    { "id": "bahia",          "name": "Bahia",          "uf": "BA", "kind": "estado" }
+  ],
+  "exterior": [
+    { "id": "chile",  "name": "Chile",          "iso": 152 },
+    { "id": "eua",    "name": "Estados Unidos", "iso": 840 },
+    { "id": "suecia", "name": "Suécia",         "iso": 752, "city": { "name": "Estocolmo", "lat": 59.3293, "lon": 18.0686 } }
+  ]
+}

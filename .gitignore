@@ -1,2 +1,3 @@
 # Cópias de segurança locais
 *.zip
+node_modules/
