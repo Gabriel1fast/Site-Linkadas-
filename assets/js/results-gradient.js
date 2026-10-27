@@ -205,7 +205,8 @@ class ScrollGradient {
     else {
       let i = 0;
       while (i < a.length - 2 && y > a[i + 1]) i++;
-      index = i + (y - a[i]) / (a[i + 1] - a[i]);
+      // Cases lado a lado têm a mesma altura: evita divisão por zero entre âncoras coincidentes
+      index = i + (y - a[i]) / Math.max(1, a[i + 1] - a[i]);
     }
     this.target = Math.min(index, this.stages.length - 1);
     if (!this.running) {

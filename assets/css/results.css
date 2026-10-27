@@ -156,6 +156,32 @@
   line-height: 1.75;
 }
 
+/* ---------- Cases só com texto (02 e 03): lado a lado no computador ---------- */
+.results__pair {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(48px, 7vw, 112px);
+  padding-block: clamp(64px, 8vw, 120px);
+}
+/* Filete vertical sutil entre os dois cases */
+.results__pair::before {
+  content: "";
+  position: absolute;
+  top: clamp(64px, 8vw, 120px);
+  bottom: clamp(64px, 8vw, 120px);
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(transparent, var(--color-border-accent) 30%, var(--color-border-accent) 70%, transparent);
+}
+.case--text-only,
+.case--text-only.case {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "content";
+  padding-block: 0;
+}
+.case--text-only .case__value { font-size: clamp(42px, 14cqi, 88px); }
+
 /* ---------- Composição de imagens ---------- */
 .case__media {
   position: relative;
@@ -317,6 +343,8 @@
 
 /* ---------- Responsivo ---------- */
 @media (max-width: 900px) {
+  .results__pair { grid-template-columns: minmax(0, 1fr); gap: clamp(56px, 12vw, 80px); padding-block: clamp(48px, 10vw, 80px); }
+  .results__pair::before { display: none; }
   .case,
   .case--text-right {
     grid-template-columns: minmax(0, 1fr);
