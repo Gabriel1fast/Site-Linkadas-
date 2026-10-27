@@ -339,3 +339,14 @@
   .case__media > [style*="--speed"] { transform: none; }
   .media-slot--a, .media-slot--b, .media-slot--c { animation: none; }
 }
+
+/* Tamanho recomendado exibido no espaço reservado (some quando a imagem for inserida) */
+.media-slot__placeholder small {
+  margin-top: -4px;
+  color: var(--color-faint);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  opacity: .85;
+}
+.media-slot--main .media-slot__placeholder span { font-size: 12px; }
