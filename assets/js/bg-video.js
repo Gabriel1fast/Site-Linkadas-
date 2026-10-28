@@ -1,16 +1,26 @@
-/* Fundos em vídeo das duas últimas dobras (6ª: lâminas de luz; 7ª: portal).
-   Os vídeos são loops curtos gerados a partir das cenas 3D originais (tools/bg-video). Mais leve que WebGL:
-   - o vídeo só é baixado quando a seção se aproxima e só reproduz enquanto está na tela;
+/* Fundos em vídeo: Hero (fitas de vidro), 6ª dobra (lâminas de luz) e 7ª dobra (portal).
+   Os vídeos são loops gerados a partir das cenas 3D originais (tools/bg-video), com superamostragem:
+   bordas lisas e movimento fluido em qualquer aparelho, sem o custo de renderizar 3D no navegador.
    - versão vertical (1080×1920) para celulares e horizontal (1920×1080) para telas largas, em MP4 H.264
      (decodificado por hardware em todos os aparelhos; o VP9 borrava os degradês escuros);
-   - a rolagem move o vídeo apenas com transform (zoom/paralaxe), que a GPU compõe sem recalcular a página. */
+   - a Hero carrega de imediato; as outras só quando a seção se aproxima; cada vídeo só reproduz enquanto visível;
+   - rolagem e cursor movem o vídeo apenas com transform, que a GPU compõe sem recalcular a página.
+   Com "reduzir movimento" ativado no sistema, os vídeos (lentos e contínuos) seguem tocando, mas sem
+   zoom/paralaxe de rolagem e cursor. */
 import { whenNear } from './lib/perf.js';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 const variant = () => (window.innerWidth / window.innerHeight < 1 ? 'mobile' : 'desktop');
 
-/* Efeito de rolagem de cada fundo. p: progresso da seção na tela (0 → 1). */
+/* Efeito de cada fundo. p: progresso da seção na tela (0 → 1); m: cursor suavizado (-1 → 1). */
 const EFFECTS = {
+  // Fitas: acompanham o cursor de leve, como a cena 3D fazia
+  hero: {
+    eager: true,
+    pointer: true,
+    transform: (p, m) => `translate3d(${(m.x * -1.2).toFixed(3)}%, ${(m.y * -0.8).toFixed(3)}%, 0) scale(1.04)`,
+  },
   // Lâminas de luz: deslizam e giram de leve, como a cena original fazia com a rolagem
   approach: {
     progress: (r, vh) => (vh - r.top) / (vh + r.height),
@@ -24,48 +34,63 @@ const EFFECTS = {
 };
 
 const active = new Set();
+const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
 let frame = 0;
+let last = 0;
 
-function update() {
+function update(now) {
   frame = 0;
   const vh = window.innerHeight;
+  // Cursor suavizado (independente da taxa de quadros); continua animando até alcançar o alvo
+  const dt = Math.min(0.1, (now - (last || now)) / 1000);
+  last = now;
+  const k = 1 - Math.exp(-dt * 3);
+  mouse.x += (mouse.tx - mouse.x) * k;
+  mouse.y += (mouse.ty - mouse.y) * k;
+  const settling = Math.abs(mouse.tx - mouse.x) + Math.abs(mouse.ty - mouse.y) > 0.002;
+
   active.forEach((item) => {
-    const p = Math.min(1, Math.max(0, item.effect.progress(item.section.getBoundingClientRect(), vh)));
-    if (Math.abs(p - item.p) < 0.0005) return;
-    item.p = p;
-    item.video.style.transform = item.effect.transform(p);
+    const p = item.effect.progress ? Math.min(1, Math.max(0, item.effect.progress(item.section.getBoundingClientRect(), vh))) : 0;
+    const key = `${p.toFixed(4)}|${item.effect.pointer ? `${mouse.x.toFixed(3)},${mouse.y.toFixed(3)}` : ''}`;
+    if (key === item.key) return;
+    item.key = key;
+    item.video.style.transform = item.effect.transform(p, mouse);
   });
+  if (settling) schedule();
+  else last = 0;
 }
-const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+function schedule() { if (!frame && !reducedMotion) frame = requestAnimationFrame(update); }
 
 function setup(video) {
   const section = video.closest('section');
   const effect = EFFECTS[video.dataset.bgVideo];
   if (!section || !effect) return;
   const base = video.dataset.src;
-  const item = { video, section, effect, p: -1, variant: '' };
+  const item = { video, section, effect, key: '', variant: '' };
 
   const load = () => {
     const v = variant();
     if (v === item.variant) return;
     item.variant = v;
     video.poster = `${base}-${v}.webp`;
-    if (reducedMotion) return; // só a imagem estática
     video.src = `${base}-${v}.mp4`;
     video.load();
+    if (active.has(item)) video.play().catch(() => {});
   };
 
-  video.addEventListener('playing', () => video.parentElement.classList.add('is-ready'), { once: true });
-  // Sem vídeo (movimento reduzido) a imagem estática entra no lugar
-  if (reducedMotion) video.parentElement.classList.add('is-ready');
+  // O primeiro quadro (igual ao pôster) já pode aparecer
+  video.addEventListener('loadeddata', () => video.parentElement.classList.add('is-ready'), { once: true });
 
-  // Baixa com antecedência (uma tela e meia antes) e reproduz só enquanto visível
-  whenNear(section, load, '150%');
+  // Hero: de imediato. Demais: com antecedência (uma tela e meia antes)
+  if (effect.eager) load();
+  else whenNear(section, load, '150%');
+
+  // Reproduz só enquanto visível
   new IntersectionObserver(([entry]) => {
     if (entry.isIntersecting) {
       active.add(item);
       schedule();
-      if (!reducedMotion) video.play().catch(() => {});
+      if (item.variant) video.play().catch(() => {});
     } else {
       active.delete(item);
       video.pause();
@@ -77,9 +102,16 @@ function setup(video) {
     schedule();
     clearTimeout(resizeTimer);
     // Girou o aparelho: troca para a versão (vertical/horizontal) adequada, se o vídeo já foi carregado
-    resizeTimer = setTimeout(() => { if (item.variant) { load(); if (active.has(item)) video.play().catch(() => {}); } }, 300);
+    resizeTimer = setTimeout(() => { if (item.variant) load(); }, 300);
   });
 }
 
 document.querySelectorAll('video[data-bg-video]').forEach(setup);
 window.addEventListener('scroll', schedule, { passive: true });
+if (finePointer) {
+  window.addEventListener('pointermove', (e) => {
+    mouse.tx = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.ty = (e.clientY / window.innerHeight) * 2 - 1;
+    schedule();
+  }, { passive: true });
+}

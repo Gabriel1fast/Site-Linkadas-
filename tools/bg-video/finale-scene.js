@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { readPalette, createRibbonGeometry, createGlassMaterial } from '../../assets/js/lib/glass.js';
+import { readPalette, createRibbonGeometry, createGlassMaterial } from './glass.js';
 
 const seg = (n) => n;
 let canvas;

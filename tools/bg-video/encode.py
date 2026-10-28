@@ -27,7 +27,8 @@ dither = float(sys.argv[8]) if len(sys.argv) > 8 else 1.0
 frames = sorted(src.glob('f*.png'))
 loop_n = round(loop_s * fps)
 fade_n = len(frames) - loop_n
-assert 0 < fade_n <= loop_n, 'renderize (loop + transição) segundos'
+# fade_n = 0: a cena já é periódica (hero) e emenda sozinha
+assert 0 <= fade_n <= loop_n, 'renderize (loop + transição) segundos'
 
 
 def load(i):
