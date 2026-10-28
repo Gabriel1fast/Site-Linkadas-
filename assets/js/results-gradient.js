@@ -2,6 +2,7 @@
    Cada etapa da seção (abertura, cases 01–04, CTA) tem uma composição luminosa própria;
    o shader interpola continuamente entre elas conforme o progresso do scroll.
    Apenas cores oficiais do Design System. */
+import { whenNear } from './lib/perf.js';
 
 const PALETTE = {
   black: [0, 0, 0],
@@ -204,7 +205,8 @@ class ScrollGradient {
     else {
       let i = 0;
       while (i < a.length - 2 && y > a[i + 1]) i++;
-      index = i + (y - a[i]) / (a[i + 1] - a[i]);
+      // Cases lado a lado têm a mesma altura: evita divisão por zero entre âncoras coincidentes
+      index = i + (y - a[i]) / Math.max(1, a[i + 1] - a[i]);
     }
     this.target = Math.min(index, this.stages.length - 1);
     if (!this.running) {
@@ -269,12 +271,15 @@ function initResultsGradient() {
     const canvas = sticky.querySelector('canvas');
     const section = sticky.closest('section');
     if (!canvas || !section) return;
-    try {
-      new ScrollGradient(sticky, canvas, section, STAGE_SETS[sticky.dataset.fluidBg] || STAGES);
-      requestAnimationFrame(() => sticky.classList.add('is-ready'));
-    } catch (error) {
-      console.warn('[fundo fluido] WebGL indisponível; mantendo o fundo em CSS.', error);
-    }
+    // Só cria o contexto WebGL quando a seção se aproxima da tela
+    whenNear(section, () => {
+      try {
+        new ScrollGradient(sticky, canvas, section, STAGE_SETS[sticky.dataset.fluidBg] || STAGES);
+        requestAnimationFrame(() => sticky.classList.add('is-ready'));
+      } catch (error) {
+        console.warn('[fundo fluido] WebGL indisponível; mantendo o fundo em CSS.', error);
+      }
+    });
   });
 }
 

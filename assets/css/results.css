@@ -156,6 +156,32 @@
   line-height: 1.75;
 }
 
+/* ---------- Cases só com texto (02 e 03): lado a lado no computador ---------- */
+.results__pair {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(48px, 7vw, 112px);
+  padding-block: clamp(64px, 8vw, 120px);
+}
+/* Filete vertical sutil entre os dois cases */
+.results__pair::before {
+  content: "";
+  position: absolute;
+  top: clamp(64px, 8vw, 120px);
+  bottom: clamp(64px, 8vw, 120px);
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(transparent, var(--color-border-accent) 30%, var(--color-border-accent) 70%, transparent);
+}
+.case--text-only,
+.case--text-only.case {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "content";
+  padding-block: 0;
+}
+.case--text-only .case__value { font-size: clamp(42px, 14cqi, 88px); }
+
 /* ---------- Composição de imagens ---------- */
 .case__media {
   position: relative;
@@ -210,7 +236,12 @@
   object-fit: cover;
   transition: scale 900ms cubic-bezier(.2,.7,.2,1);
 }
-.media-slot:has(> img) .media-slot__placeholder { display: none; }
+/* Com imagem: o espaço mostra só o degradê de fundo enquanto ela carrega, e a imagem surge suavemente */
+.media-slot:has(> img) .media-slot__placeholder > *,
+.media-slot:has(> img) .media-slot__placeholder::before,
+.media-slot:has(> img) .media-slot__placeholder::after { display: none; }
+.media-slot > img { opacity: 0; transition: opacity 600ms ease, scale 900ms cubic-bezier(.2,.7,.2,1); }
+.media-slot.is-loaded > img { opacity: 1; }
 .media-slot:hover { border-color: var(--color-border-accent); box-shadow: var(--shadow-lg), var(--shadow-glow); }
 .media-slot:hover > img { scale: 1.04; }
 
@@ -317,6 +348,8 @@
 
 /* ---------- Responsivo ---------- */
 @media (max-width: 900px) {
+  .results__pair { grid-template-columns: minmax(0, 1fr); gap: clamp(56px, 12vw, 80px); padding-block: clamp(48px, 10vw, 80px); }
+  .results__pair::before { display: none; }
   .case,
   .case--text-right {
     grid-template-columns: minmax(0, 1fr);
@@ -339,3 +372,14 @@
   .case__media > [style*="--speed"] { transform: none; }
   .media-slot--a, .media-slot--b, .media-slot--c { animation: none; }
 }
+
+/* Tamanho recomendado exibido no espaço reservado (some quando a imagem for inserida) */
+.media-slot__placeholder small {
+  margin-top: -4px;
+  color: var(--color-faint);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  opacity: .85;
+}
+.media-slot--main .media-slot__placeholder span { font-size: 12px; }

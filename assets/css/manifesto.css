@@ -72,8 +72,7 @@
   background:
     radial-gradient(ellipse 50% 55% at 50% 50%, rgba(197,26,216,.24), transparent 70%),
     radial-gradient(ellipse 70% 60% at 50% 55%, rgba(139,42,194,.22), transparent 72%);
-  filter: blur(24px);
-  opacity: clamp(.25, calc(var(--s) * 1.6), 1);
+  opacity: clamp(.25, calc(var(--s) * 1.6), 1); /* gradientes já são suaves: sem filtro de desfoque */
 }
 
 /* Quadro (componente card do Design System) */

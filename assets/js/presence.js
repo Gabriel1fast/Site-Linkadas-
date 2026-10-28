@@ -185,7 +185,11 @@ function layout() {
 
 // ---------- Rolagem: progresso da revelação ----------
 let frame = 0;
+let lastP = -1;
 function setProgress(p) {
+  // Evita recalcular estilos do mapa inteiro quando nada mudou (ex.: já totalmente revelado)
+  if (Math.abs(p - lastP) < 0.002) return;
+  lastP = p;
   const s = section.style;
   s.setProperty('--p-map', range(p, 0, 0.3).toFixed(3));
   s.setProperty('--p-borders', range(p, 0.14, 0.5).toFixed(3));

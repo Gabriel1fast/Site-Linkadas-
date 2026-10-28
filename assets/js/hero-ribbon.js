@@ -6,6 +6,11 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { readPalette, createRibbonGeometry, createGlassMaterial, webglAvailable } from './lib/glass.js';
+import { tier, QUALITY, deviceDpr, createLoop } from './lib/perf.js';
+
+// Densidade da malha conforme o aparelho (celulares: metade dos vértices)
+const DETAIL = tier === 'high' ? 1 : 0.5;
+const seg = (n) => Math.round(n * DETAIL);
 
 class GlassRibbonScene {
   constructor(canvas, container, anchor) {
@@ -14,13 +19,12 @@ class GlassRibbonScene {
     this.anchor = anchor;
     this.pointer = new THREE.Vector2();
     this.pointerTarget = new THREE.Vector2();
-    this.clock = new THREE.Clock();
     this.elapsed = 0;
-    this.running = false;
     this.visible = true;
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+    this.resScale = 1;
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
     this.renderer.setClearColor(0x000000, 1);
     this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
@@ -35,29 +39,29 @@ class GlassRibbonScene {
     this.materials = [];
     this.buildShapes();
 
-    // Pós-processamento com multisampling 4x (o antialias nativo não se aplica ao composer)
-    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: this.renderer.capabilities.isWebGL2 ? 4 : 0 });
+    // Pós-processamento: multisampling só em computadores (o antialias nativo não se aplica ao composer)
+    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: this.renderer.capabilities.isWebGL2 ? QUALITY.msaa : 0 });
     this.composer = new EffectComposer(this.renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.75, 0.5, 0.42);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(QUALITY.bloomRes, QUALITY.bloomRes), 0.75, 0.5, 0.42);
     this.composer.addPass(this.bloom);
 
     this.onResize = this.onResize.bind(this);
     this.onPointer = this.onPointer.bind(this);
-    this.tick = this.tick.bind(this);
 
     this.resizeObserver = new ResizeObserver(this.onResize);
     this.resizeObserver.observe(container);
     document.fonts?.ready.then(this.onResize);
     window.addEventListener('pointermove', this.onPointer, { passive: true });
 
-    this.intersection = new IntersectionObserver(([entry]) => {
-      this.visible = entry.isIntersecting;
-      this.visible ? this.start() : this.stop();
-    });
-    this.intersection.observe(container);
-    document.addEventListener('visibilitychange', () => (document.hidden ? this.stop() : this.start()));
-    this.reducedMotion.addEventListener?.('change', () => (this.reducedMotion.matches ? this.renderStill() : this.start()));
+    // Laço com limite de fps, pausa fora da tela e resolução adaptativa
+    if (!this.reducedMotion.matches) {
+      this.loop = createLoop({
+        el: container,
+        frame: (dt) => { this.update(dt); this.render(); },
+        onScale: (scale) => { this.resScale = scale; this.onResize(); },
+      });
+    }
 
     this.onResize();
   }
@@ -77,7 +81,7 @@ class GlassRibbonScene {
     }
     const ringCurve = new THREE.CatmullRomCurve3(ringPoints, true, 'centripetal');
     const ring = new THREE.Mesh(
-      createRibbonGeometry(ringCurve, { segments: 640, radial: 48, width: 0.62, thickness: 0.09, closed: true, twist: () => Math.PI / 2 + 0.25 }),
+      createRibbonGeometry(ringCurve, { segments: seg(640), radial: seg(48), width: 0.62, thickness: 0.09, closed: true, twist: () => Math.PI / 2 + 0.25 }),
       this.createMaterial({ intensity: 0.95, hue: 1.4, sweep: 0.8, wave: 0.6 }),
     );
     ring.rotation.set(0.5, 0.18, -0.16);
@@ -97,8 +101,8 @@ class GlassRibbonScene {
     ], false, 'centripetal');
     const ribbon = new THREE.Mesh(
       createRibbonGeometry(ribbonCurve, {
-        segments: 1000,
-        radial: 56,
+        segments: seg(1000),
+        radial: seg(56),
         width: 1.25,
         thickness: 0.13,
         twist: (u) => 0.35 + u * Math.PI * 1.65,
@@ -114,7 +118,7 @@ class GlassRibbonScene {
       'centripetal',
     );
     const thread = new THREE.Mesh(
-      createRibbonGeometry(threadCurve, { segments: 800, radial: 24, width: 0.14, thickness: 0.06, twist: (u) => u * 4 }),
+      createRibbonGeometry(threadCurve, { segments: seg(800), radial: seg(24), width: 0.14, thickness: 0.06, twist: (u) => u * 4 }),
       this.createMaterial({ intensity: 0.7, hue: 2.4, sweep: 1.4 }),
     );
     this.group.add(thread);
@@ -127,7 +131,7 @@ class GlassRibbonScene {
   onResize() {
     const { clientWidth: w, clientHeight: h } = this.container;
     if (!w || !h) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = deviceDpr() * this.resScale;
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(dpr);
@@ -148,7 +152,7 @@ class GlassRibbonScene {
     this.baseY = (0.5 - centerPx / h) * visibleH;
     this.group.position.y = this.baseY;
 
-    if (!this.running) this.renderStill();
+    this.renderStill();
   }
 
   update(delta) {
@@ -169,29 +173,6 @@ class GlassRibbonScene {
     this.update(0);
     this.render();
   }
-
-  start() {
-    if (this.running || !this.visible || document.hidden) return;
-    if (this.reducedMotion.matches) {
-      this.renderStill();
-      return;
-    }
-    this.running = true;
-    this.clock.getDelta();
-    this.raf = requestAnimationFrame(this.tick);
-  }
-
-  stop() {
-    this.running = false;
-    cancelAnimationFrame(this.raf);
-  }
-
-  tick() {
-    if (!this.running) return;
-    this.update(Math.min(this.clock.getDelta(), 0.05));
-    this.render();
-    this.raf = requestAnimationFrame(this.tick);
-  }
 }
 
 function initHeroVisual() {
@@ -210,7 +191,6 @@ function initHeroVisual() {
     // Primeiro frame já desenhado antes do fade-in, para evitar piscar
     scene.update(0);
     scene.render();
-    scene.start();
     requestAnimationFrame(() => container.classList.add('is-ready'));
   } catch (error) {
     console.warn('[hero] WebGL indisponível, usando fallback.', error);
