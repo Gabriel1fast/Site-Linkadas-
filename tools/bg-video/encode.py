@@ -1,6 +1,7 @@
 """Transforma os quadros de render.cjs num vídeo de fundo em loop perfeito (WebM VP9 + MP4 H.264 + pôster WebP).
 
-Uso: python3 tools/bg-video/encode.py <pasta-dos-quadros> <loop-em-segundos> <fps> <saída-sem-extensão> [crf-webm] [crf-mp4]
+Uso: python3 tools/bg-video/encode.py <pasta-dos-quadros> <loop-em-segundos> <fps> <saída-sem-extensão> [crf-webm] [crf-mp4] [LxA]
+(LxA: tamanho final; quadros renderizados maiores são reduzidos → bordas lisas por superamostragem)
 Ex.: python3 tools/bg-video/encode.py /tmp/quadros/finale-desktop 10 30 assets/video/finale-desktop
 
 Loop sem emenda: a cena é renderizada por (loop + transição) segundos. O início do vídeo é uma fusão
@@ -17,6 +18,7 @@ from PIL import Image
 src, loop_s, fps, out = Path(sys.argv[1]), float(sys.argv[2]), int(sys.argv[3]), sys.argv[4]
 crf_webm = sys.argv[5] if len(sys.argv) > 5 else '44'
 crf_mp4 = sys.argv[6] if len(sys.argv) > 6 else '30'
+size = tuple(map(int, sys.argv[7].split('x'))) if len(sys.argv) > 7 else None
 
 frames = sorted(src.glob('f*.png'))
 loop_n = round(loop_s * fps)
@@ -25,7 +27,10 @@ assert 0 < fade_n <= loop_n, 'renderize (loop + transição) segundos'
 
 
 def load(i):
-    return np.asarray(Image.open(frames[i]).convert('RGB'), dtype=np.float32)
+    img = Image.open(frames[i]).convert('RGB')
+    if size and img.size != size:
+        img = img.resize(size, Image.LANCZOS)
+    return np.asarray(img, dtype=np.float32)
 
 
 with tempfile.TemporaryDirectory() as tmp:

@@ -11,13 +11,13 @@
 <body>
   <canvas id="c"></canvas>
   <script type="module">
-    // ?scene=approach|finale&w=1920&h=1080 → window.renderFrame(t) desenha o instante t (s) e devolve PNG em base64
+    // ?scene=approach|finale&w=1920&h=1080[&ss=2] → window.renderFrame(t) desenha o instante t (s) e devolve PNG em base64
     const q = new URLSearchParams(location.search);
     const canvas = document.getElementById('c');
     canvas.width = +q.get('w');
     canvas.height = +q.get('h');
     const mod = q.get('scene') === 'finale' ? await import('./finale-scene.js') : await import('./approach-scene.js');
-    const draw = q.get('scene') === 'finale' ? mod.createFinaleScene(canvas) : mod.createApproachScene(canvas);
+    const draw = q.get('scene') === 'finale' ? mod.createFinaleScene(canvas, { ss: +(q.get('ss') || 1) }) : mod.createApproachScene(canvas);
     window.renderFrame = (t) => { draw(t); return canvas.toDataURL('image/png').split(',')[1]; };
     window.ready = true;
   </script>

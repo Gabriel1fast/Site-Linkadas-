@@ -1,5 +1,5 @@
 /* Gera os quadros PNG de uma cena de fundo (6ª ou 7ª dobra) para virar vídeo em loop.
-   Uso: node tools/bg-video/render.cjs <approach|finale> <largura> <altura> <segundos> <fps> <pasta-de-saída>
+   Uso: node tools/bg-video/render.cjs <approach|finale> <largura> <altura> <segundos> <fps> <pasta-de-saída> [superamostragem]
    (com o site servido em http://localhost:8123). Depois: tools/bg-video/encode.sh */
 const { chromium } = require('playwright');
 const { mkdirSync, writeFileSync } = require('node:fs');
@@ -7,12 +7,12 @@ const { join } = require('node:path');
 
 (async () => {
 
-const [scene, w, h, seconds, fps, out] = process.argv.slice(2);
+const [scene, w, h, seconds, fps, out, ss = '1'] = process.argv.slice(2);
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 const page = await browser.newPage({ viewport: { width: +w, height: +h } });
 page.on('pageerror', (e) => console.error(e.message));
-await page.goto(`http://localhost:8123/tools/bg-video/render.html?scene=${scene}&w=${w}&h=${h}`);
+await page.goto(`http://localhost:8123/tools/bg-video/render.html?scene=${scene}&w=${w}&h=${h}&ss=${ss}`);
 await page.waitForFunction(() => window.ready);
 const total = Math.round(+seconds * +fps);
 for (let i = 0; i < total; i++) {

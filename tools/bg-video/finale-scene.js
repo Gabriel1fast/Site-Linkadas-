@@ -9,6 +9,9 @@ import { readPalette, createRibbonGeometry, createGlassMaterial } from '../../as
 const seg = (n) => n;
 let canvas;
 let visual;
+// Superamostragem: a cena é renderizada SS vezes maior e reduzida no vídeo. Larguras medidas em pixels
+// (linhas da grade, antisserrilhado dos anéis) são multiplicadas por SS para o resultado final ficar igual.
+let SS = 1;
 
 const circle = (r, n = 128) => new THREE.CatmullRomCurve3(
   Array.from({ length: n }, (_, i) => { const a = (i / n) * Math.PI * 2; return new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r, 0); }),
@@ -28,7 +31,7 @@ const gridMaterial = (palette) => new THREE.ShaderMaterial({
     varying vec3 vWorld;
     void main() {
       vec2 g = vec2(vWorld.x, vWorld.z + uFlow) / 1.6;
-      vec2 w = fwidth(g);
+      vec2 w = fwidth(g) * ${SS.toFixed(2)};
       vec2 dist = abs(fract(g - 0.5) - 0.5) / w;                  // distância à linha, em pixels
       float core = 1.0 - smoothstep(0.0, 1.2, min(dist.x, dist.y)); // linha nítida (~1px, antisserrilhada)
       float halo = exp(-min(dist.x, dist.y) * 0.6) * 0.18;           // brilho suave ao redor
@@ -64,7 +67,7 @@ const ringMaterial = (palette, { radius, width, intensity = 1, speed = 0.3, phas
     void main() {
       float r = length(vP);
       float d = abs(r - uRadius);
-      float fw = fwidth(r);
+      float fw = fwidth(r) * ${SS.toFixed(2)};
       float core = 1.0 - smoothstep(uWidth * 0.5, uWidth * 0.5 + fw * 1.5, d);
       float halo = exp(-d / (uWidth * 2.0 + fw * 1.5)) * 0.22;
       float a = atan(vP.y, vP.x);
@@ -238,7 +241,8 @@ class FinaleScene {
 }
 
 
-export function createFinaleScene(target, { scroll = 0.85 } = {}) {
+export function createFinaleScene(target, { scroll = 0.85, ss = 1 } = {}) {
+  SS = ss;
   canvas = target;
   visual = { clientWidth: target.width, clientHeight: target.height };
   const scene = new FinaleScene();
