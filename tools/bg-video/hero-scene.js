@@ -1,16 +1,33 @@
-/* Hero — elemento tridimensional: fitas de vidro líquido (Three.js)
-   Material de vidro procedural (Fresnel + reflexão/refração de um estúdio de luz
-   nas cores oficiais), iluminação cinematográfica com bloom e movimento contínuo. */
+/* Cena da Hero (fitas de vidro) — usada só para gerar o vídeo de fundo (tools/bg-video/render.cjs).
+   Para o vídeo emendar sem corte, todos os movimentos se repetem exatamente a cada LOOP segundos:
+   as frequências originais foram arredondadas para múltiplos de 2π/LOOP (mesmo ritmo, quase idêntico). */
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { readPalette, createRibbonGeometry, createGlassMaterial, webglAvailable } from './lib/glass.js';
-import { tier, QUALITY, deviceDpr, createLoop } from './lib/perf.js';
+import { readPalette, createRibbonGeometry, createGlassMaterial } from './glass.js';
 
-// Densidade da malha conforme o aparelho (celulares: metade dos vértices)
-const DETAIL = tier === 'high' ? 1 : 0.5;
-const seg = (n) => Math.round(n * DETAIL);
+export const LOOP = 20;
+const W = (2 * Math.PI) / LOOP; // 1 ciclo por loop
+const seg = (n) => n;
+const QUALITY = { msaa: 8 };
+let SS = 1;
+let CONTENT = 0.62; // fração da altura ocupada pelo conteúdo (até o CTA); as fitas ficam no espaço abaixo
+
+/* Material de vidro com tempo periódico: o shader original usa uTime com várias velocidades; aqui cada
+   termo recebe uma fase que dá voltas inteiras no loop. */
+function periodicGlass(palette, options) {
+  const m = createGlassMaterial(palette, options);
+  const sweepTurns = Math.max(1, Math.round(0.035 * (options.sweep ?? 1) * LOOP));
+  m.vertexShader = m.vertexShader
+    .replace('uTime * 0.42', `uTime * ${(W * 1).toFixed(6)}`)
+    .replace('uTime * 0.31', `uTime * ${(W * 1).toFixed(6)}`)
+    .replace('uTime * 0.33', `uTime * ${(W * 1).toFixed(6)}`);
+  m.fragmentShader = m.fragmentShader
+    .replace('uTime * 0.16', `uTime * ${(W * 1).toFixed(6)}`)
+    .replace('uTime * 0.035 * uSweep', `uTime * ${(sweepTurns / LOOP).toFixed(6)}`);
+  return m;
+}
 
 class GlassRibbonScene {
   constructor(canvas, container, anchor) {
@@ -24,7 +41,7 @@ class GlassRibbonScene {
     this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     this.resScale = 1;
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, preserveDrawingBuffer: true });
     this.renderer.setClearColor(0x000000, 1);
     this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
@@ -43,31 +60,17 @@ class GlassRibbonScene {
     const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: this.renderer.capabilities.isWebGL2 ? QUALITY.msaa : 0 });
     this.composer = new EffectComposer(this.renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(QUALITY.bloomRes, QUALITY.bloomRes), 0.75, 0.5, 0.42);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.75, 0.5, 0.42);
+    // Com superamostragem, o bloom é calculado no tamanho final do vídeo: o brilho fica igual ao do site
+    const setBloomSize = this.bloom.setSize.bind(this.bloom);
+    this.bloom.setSize = (w, h) => setBloomSize(Math.round(w / SS), Math.round(h / SS));
     this.composer.addPass(this.bloom);
-
-    this.onResize = this.onResize.bind(this);
-    this.onPointer = this.onPointer.bind(this);
-
-    this.resizeObserver = new ResizeObserver(this.onResize);
-    this.resizeObserver.observe(container);
-    document.fonts?.ready.then(this.onResize);
-    window.addEventListener('pointermove', this.onPointer, { passive: true });
-
-    // Laço com limite de fps, pausa fora da tela e resolução adaptativa
-    if (!this.reducedMotion.matches) {
-      this.loop = createLoop({
-        el: container,
-        frame: (dt) => { this.update(dt); this.render(); },
-        onScale: (scale) => { this.resScale = scale; this.onResize(); },
-      });
-    }
 
     this.onResize();
   }
 
   createMaterial(options) {
-    const material = createGlassMaterial(this.palette, options);
+    const material = periodicGlass(this.palette, options);
     this.materials.push(material);
     return material;
   }
@@ -124,26 +127,19 @@ class GlassRibbonScene {
     this.group.add(thread);
   }
 
-  onPointer(event) {
-    this.pointerTarget.set((event.clientX / window.innerWidth) * 2 - 1, (event.clientY / window.innerHeight) * 2 - 1);
-  }
-
   onResize() {
-    const { clientWidth: w, clientHeight: h } = this.container;
-    if (!w || !h) return;
-    const dpr = deviceDpr() * this.resScale;
-    this.renderer.setPixelRatio(dpr);
+    const { width: w, height: h } = this.canvas;
+    this.renderer.setPixelRatio(1);
     this.renderer.setSize(w, h, false);
-    this.composer.setPixelRatio(dpr);
+    this.composer.setPixelRatio(1);
     this.composer.setSize(w, h);
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
 
-    // Enquadramento: a composição ocupa o espaço livre abaixo do conteúdo (CTA)
+    // Enquadramento igual ao do site: a composição ocupa o espaço livre abaixo do conteúdo
     const visibleH = 2 * this.camera.position.z * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
     const visibleW = visibleH * this.camera.aspect;
-    const containerTop = this.container.getBoundingClientRect().top;
-    const contentBottom = this.anchor ? this.anchor.getBoundingClientRect().bottom - containerTop : h * 0.62;
+    const contentBottom = h * CONTENT;
     const free = Math.max(h - contentBottom, h * 0.25);
     const freeWorld = (free / h) * visibleH;
     const scale = THREE.MathUtils.clamp(Math.max(visibleW / 13.5, freeWorld / 3.6), 0.5, 1.3);
@@ -151,51 +147,25 @@ class GlassRibbonScene {
     const centerPx = Math.min(contentBottom + free * 0.55, h * 0.86);
     this.baseY = (0.5 - centerPx / h) * visibleH;
     this.group.position.y = this.baseY;
-
-    this.renderStill();
   }
 
-  update(delta) {
-    this.elapsed += delta;
-    this.pointer.lerp(this.pointerTarget, Math.min(1, delta * 2.2));
-    const t = this.elapsed;
-    this.group.rotation.y = Math.sin(t * 0.12) * 0.06 + this.pointer.x * 0.1;
-    this.group.rotation.x = this.pointer.y * 0.05;
-    this.group.position.y = this.baseY + Math.sin(t * 0.35) * 0.08;
+  update(t) {
+    this.group.rotation.y = Math.sin(t * W) * 0.05;
+    this.group.position.y = this.baseY + Math.sin(t * W) * 0.08;
     for (const material of this.materials) material.uniforms.uTime.value = t;
   }
 
   render() {
     this.composer.render();
   }
-
-  renderStill() {
-    this.update(0);
-    this.render();
-  }
 }
 
-function initHeroVisual() {
-  const container = document.querySelector('[data-hero-visual]');
-  const canvas = container?.querySelector('[data-hero-canvas]');
-  const anchor = document.querySelector('[data-hero-anchor]');
-  if (!container || !canvas) return;
-
-  if (!webglAvailable()) {
-    container.classList.add('is-fallback');
-    return;
-  }
-
-  try {
-    const scene = new GlassRibbonScene(canvas, container, anchor);
-    // Primeiro frame já desenhado antes do fade-in, para evitar piscar
-    scene.update(0);
+export function createHeroScene(canvas, { ss = 1, content = 0.62 } = {}) {
+  SS = ss;
+  CONTENT = content;
+  const scene = new GlassRibbonScene(canvas, null, null);
+  return (time) => {
+    scene.update(time);
     scene.render();
-    requestAnimationFrame(() => container.classList.add('is-ready'));
-  } catch (error) {
-    console.warn('[hero] WebGL indisponível, usando fallback.', error);
-    container.classList.add('is-fallback');
-  }
+  };
 }
-
-initHeroVisual();

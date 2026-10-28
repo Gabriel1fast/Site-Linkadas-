@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Render de fundo</title>
+  <style>html, body { margin: 0; background: #000; } canvas { display: block; }</style>
+  <script type="importmap">
+    { "imports": { "three": "../../assets/vendor/three/three.module.min.js", "three/addons/": "../../assets/vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <script type="module">
+    // ?scene=approach|finale|hero&w=1920&h=1080[&ss=2][&content=0.62] → window.renderFrame(t) desenha o instante t (s) e devolve PNG em base64
+    const q = new URLSearchParams(location.search);
+    const canvas = document.getElementById('c');
+    canvas.width = +q.get('w');
+    canvas.height = +q.get('h');
+    const scene = q.get('scene');
+    const ss = +(q.get('ss') || 1);
+    const mod = await import(`./${scene}-scene.js`);
+    const draw = {
+      approach: () => mod.createApproachScene(canvas),
+      finale: () => mod.createFinaleScene(canvas, { ss }),
+      hero: () => mod.createHeroScene(canvas, { ss, content: +(q.get('content') || 0.62) }),
+    }[scene]();
+    window.renderFrame = (t) => { draw(t); return canvas.toDataURL('image/png').split(',')[1]; };
+    window.ready = true;
+  </script>
+</body>
+</html>
