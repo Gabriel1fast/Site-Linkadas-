@@ -181,6 +181,8 @@
   padding-block: 0;
 }
 .case--text-only .case__value { font-size: clamp(42px, 14cqi, 88px); }
+/* Título em texto (não número): pode quebrar em duas linhas, em tamanho um pouco menor */
+.case__value.case__value--long { white-space: normal; font-size: clamp(38px, 10cqi, 92px); line-height: 1; letter-spacing: -.045em; }
 
 /* ---------- Composição de imagens ---------- */
 .case__media {
