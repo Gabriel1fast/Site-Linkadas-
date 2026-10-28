@@ -30,7 +30,7 @@ export function whenNear(el, init, margin = '600px') {
 
 /* Laço de animação com limite de fps e resolução adaptativa:
    se os quadros ficarem lentos, reduz a escala de pixels (até 50%); se sobrar folga, recupera. */
-export function createLoop({ el, frame, onScale, fps = QUALITY.fps }) {
+export function createLoop({ el, frame, onScale, fps = QUALITY.fps, minScale = 0.5 }) {
   let running = false;
   let raf = 0;
   let last = 0;
@@ -54,7 +54,7 @@ export function createLoop({ el, frame, onScale, fps = QUALITY.fps }) {
     // Governador: quadro acima do orçamento por vários ciclos → reduz; muito abaixo → recupera
     const budget = interval * 0.85;
     if (elapsed > interval * 1.6 || acc > budget) { slow++; fast = 0; } else if (elapsed < interval * 1.15) { fast++; slow = 0; }
-    if (slow > 12 && scale > 0.5) { scale = Math.max(0.5, scale - 0.15); slow = 0; onScale?.(scale); }
+    if (slow > 12 && scale > minScale) { scale = Math.max(minScale, scale - 0.15); slow = 0; onScale?.(scale); }
     if (fast > 240 && scale < 1) { scale = Math.min(1, scale + 0.1); fast = 0; onScale?.(scale); }
   }
 

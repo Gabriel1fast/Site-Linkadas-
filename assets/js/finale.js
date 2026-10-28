@@ -6,9 +6,13 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { readPalette, createRibbonGeometry, createGlassMaterial, webglAvailable } from './lib/glass.js';
-import { tier, QUALITY, deviceDpr, createLoop, whenApproaching, idle } from './lib/perf.js';
+import { tier, QUALITY, createLoop, whenApproaching, idle } from './lib/perf.js';
 
 const DETAIL = tier === 'high' ? 1 : 0.5;
+/* Nitidez: a cena é simples, então mesmo em celulares ela é desenhada perto da densidade real da tela
+   (em 1x, numa tela 3x, o portal ficava serrilhado/pixelado). */
+const MAX_DPR = tier === 'high' ? QUALITY.maxDpr : 1.75;
+const dprFor = () => Math.min(window.devicePixelRatio || 1, MAX_DPR);
 const seg = (n) => Math.round(n * DETAIL);
 
 const section = document.querySelector('[data-finale]');
@@ -85,6 +89,10 @@ const ringMaterial = (palette, { radius, width, intensity = 1, speed = 0.3, phas
   extensions: { derivatives: true },
 });
 
+/* Faixa estreita em volta do raio do anel: só os pixels perto da linha são desenhados
+   (um plano quadrado cobria a tela inteira, e com 11 anéis sobrepostos o custo por quadro era enorme) */
+const ringBand = (radius, margin = 0.45) => new THREE.RingGeometry(radius - margin, radius + margin, 192, 1);
+
 /* Brilho atrás do portal (disco com gradiente radial) */
 const glowMaterial = (palette) => new THREE.ShaderMaterial({
   uniforms: { uTime: { value: 0 }, cViolet: { value: palette.violet }, cMagenta: { value: palette.magenta }, cOff: { value: palette.offwhite } },
@@ -126,7 +134,10 @@ class FinaleScene {
     this.build();
 
     // Pós-processamento: multisampling só em computadores (o antialias nativo não se aplica ao composer)
-    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: this.renderer.capabilities.isWebGL2 ? QUALITY.msaa : 0 });
+    // Multisampling 4x também nos celulares (barato em GPUs móveis): borda do anel de vidro lisa.
+    // Só quando o aparelho aceita multisampling em ponto flutuante; senão, segue sem (a cena funciona igual).
+    const msaaOk = this.renderer.capabilities.isWebGL2 && this.renderer.extensions.has('EXT_color_buffer_float');
+    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: msaaOk ? 4 : 0 });
     this.composer = new EffectComposer(this.renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
     this.bloom = new UnrealBloomPass(new THREE.Vector2(QUALITY.bloomRes, QUALITY.bloomRes), 0.85, 0.5, 0.38);
@@ -156,7 +167,7 @@ class FinaleScene {
     this.scene.add(this.portal);
 
     // Anel interno fino, girando em outro eixo (sensação de mecanismo)
-    this.inner = new THREE.Mesh(new THREE.PlaneGeometry(9.6, 9.6), ringMaterial(this.palette, { radius: 4.5, width: 0.035, intensity: 0.55, speed: 0.5 }));
+    this.inner = new THREE.Mesh(ringBand(4.5), ringMaterial(this.palette, { radius: 4.5, width: 0.035, intensity: 0.55, speed: 0.5 }));
     this.inner.position.copy(this.portal.position);
     this.scene.add(this.inner);
 
@@ -167,7 +178,7 @@ class FinaleScene {
 
     // Túnel: anéis finos que se afastam no horizonte e avançam com a rolagem
     this.tunnel = [];
-    const ringGeo = new THREE.PlaneGeometry(11, 11);
+    const ringGeo = ringBand(5.2);
     for (let i = 0; i < 10; i++) {
       const ring = new THREE.Mesh(ringGeo, ringMaterial(this.palette, { radius: 5.2, width: 0.022, intensity: 0.38, speed: 0.25, phase: i * 0.9 }));
       ring.position.set(0, 0.35, -3 - i * 3.2);
@@ -186,7 +197,7 @@ class FinaleScene {
   resize() {
     const { clientWidth: w, clientHeight: h } = visual;
     if (!w || !h) return;
-    const dpr = deviceDpr() * this.resScale;
+    const dpr = dprFor() * this.resScale;
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(dpr);
@@ -223,7 +234,9 @@ class FinaleScene {
       const s = 1 + Math.sin(i + t * 0.2) * 0.03;
       ring.scale.setScalar(s);
       // Entra suave perto do portal e some cedo na distância (o centro, atrás do texto, fica limpo)
-      ring.material.uniforms.uIntensity.value = 0.3 * THREE.MathUtils.smoothstep(-z0, 2.5, 6) * (1 - THREE.MathUtils.smoothstep(-z0, 7, 18));
+      const intensity = 0.3 * THREE.MathUtils.smoothstep(-z0, 2.5, 6) * (1 - THREE.MathUtils.smoothstep(-z0, 7, 18));
+      ring.material.uniforms.uIntensity.value = intensity;
+      ring.visible = intensity > 0.002; // anel apagado não é desenhado
     });
     this.gridMat.uniforms.uFlow.value = flow * 0.6;
     this.glow.material.uniforms.uTime.value = t;
@@ -275,6 +288,8 @@ async function init() {
 
   createLoop({
     el: section,
+    // Se faltar fôlego, reduz no máximo até 70% (abaixo disso o portal voltaria a pixelar)
+    minScale: 0.7,
     frame: (dt) => { scene.update(dt); scene.render(); },
     onScale: (scale) => { scene.resScale = scale; scene.resize(); },
   });
