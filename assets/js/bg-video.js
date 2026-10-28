@@ -1,13 +1,12 @@
 /* Fundos em vídeo das duas últimas dobras (6ª: lâminas de luz; 7ª: portal).
    Os vídeos são loops curtos gerados a partir das cenas 3D originais (tools/bg-video). Mais leve que WebGL:
    - o vídeo só é baixado quando a seção se aproxima e só reproduz enquanto está na tela;
-   - versão vertical para celulares e horizontal para telas largas; WebM (VP9) com MP4 (H.264) de reserva;
+   - versão vertical (1080×1920) para celulares e horizontal (1920×1080) para telas largas, em MP4 H.264
+     (decodificado por hardware em todos os aparelhos; o VP9 borrava os degradês escuros);
    - a rolagem move o vídeo apenas com transform (zoom/paralaxe), que a GPU compõe sem recalcular a página. */
 import { whenNear } from './lib/perf.js';
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const probe = document.createElement('video');
-const ext = probe.canPlayType('video/webm; codecs="vp9"') ? 'webm' : 'mp4';
 const variant = () => (window.innerWidth / window.innerHeight < 1 ? 'mobile' : 'desktop');
 
 /* Efeito de rolagem de cada fundo. p: progresso da seção na tela (0 → 1). */
@@ -52,7 +51,7 @@ function setup(video) {
     item.variant = v;
     video.poster = `${base}-${v}.webp`;
     if (reducedMotion) return; // só a imagem estática
-    video.src = `${base}-${v}.${ext}`;
+    video.src = `${base}-${v}.mp4`;
     video.load();
   };
 
