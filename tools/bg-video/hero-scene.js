@@ -19,13 +19,12 @@ let CONTENT = 0.62; // fração da altura ocupada pelo conteúdo (até o CTA); a
 function periodicGlass(palette, options) {
   const m = createGlassMaterial(palette, options);
   const sweepTurns = Math.max(1, Math.round(0.035 * (options.sweep ?? 1) * LOOP));
-  m.vertexShader = m.vertexShader
-    .replace('uTime * 0.42', `uTime * ${(W * 1).toFixed(6)}`)
-    .replace('uTime * 0.31', `uTime * ${(W * 1).toFixed(6)}`)
-    .replace('uTime * 0.33', `uTime * ${(W * 1).toFixed(6)}`);
+  // Uma única passada por shader (substituições em sequência poderiam casar com um valor já trocado)
+  const w = W.toFixed(8);
+  m.vertexShader = m.vertexShader.replace(/uTime \* 0\.(42|31|33)\b/g, `uTime * ${w}`);
   m.fragmentShader = m.fragmentShader
-    .replace('uTime * 0.16', `uTime * ${(W * 1).toFixed(6)}`)
-    .replace('uTime * 0.035 * uSweep', `uTime * ${(sweepTurns / LOOP).toFixed(6)}`);
+    .replace(/uTime \* 0\.16\b/, `uTime * ${w}`)
+    .replace('uTime * 0.035 * uSweep', `uTime * ${(sweepTurns / LOOP).toFixed(8)}`);
   return m;
 }
 
