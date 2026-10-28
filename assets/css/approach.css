@@ -22,19 +22,23 @@
   top: 0;
   height: 100vh;
   height: 100lvh;
-  /* Base caso o WebGL não esteja disponível */
+  /* Base enquanto o vídeo carrega (ou se não puder ser reproduzido) */
   background:
     radial-gradient(ellipse 40% 55% at 70% 45%, rgba(197,26,216,.28), transparent 70%),
     radial-gradient(ellipse 50% 40% at 85% 80%, rgba(139,42,194,.3), transparent 70%),
     #0B0414;
 }
-.approach__canvas {
+.approach__video {
+  display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
   opacity: 0;
+  transform: scale(1.1); /* margem para o paralaxe da rolagem (bg-video.js) não mostrar as bordas */
   transition: opacity 1200ms ease;
+  will-change: transform;
 }
-.approach__bg-sticky.is-ready .approach__canvas { opacity: 1; }
+.approach__bg-sticky.is-ready .approach__video { opacity: 1; }
 .approach__bg::before,
 .approach__bg::after {
   content: "";

@@ -1,24 +1,14 @@
-/* 7ª dobra — portal de vidro 3D com túnel de anéis e grade em perspectiva (Three.js).
-   Mesmo material de vidro e bloom da Hero: o site abre e fecha com a mesma linguagem visual.
-   A rolagem aproxima a câmera do portal e faz os anéis do túnel avançarem. */
+/* Cena da 7ª dobra (portal de vidro, túnel de anéis e grade) — usada só para gerar o vídeo de fundo
+   (tools/bg-video/render.cjs). O site exibe o vídeo; esta cena é a fonte, para regerar o vídeo se o visual mudar. */
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { readPalette, createRibbonGeometry, createGlassMaterial, webglAvailable } from './lib/glass.js';
-import { tier, QUALITY, createLoop, whenApproaching, idle } from './lib/perf.js';
+import { readPalette, createRibbonGeometry, createGlassMaterial } from '../../assets/js/lib/glass.js';
 
-const DETAIL = tier === 'high' ? 1 : 0.5;
-/* Nitidez: a cena é simples, então mesmo em celulares ela é desenhada perto da densidade real da tela
-   (em 1x, numa tela 3x, o portal ficava serrilhado/pixelado). */
-const MAX_DPR = tier === 'high' ? QUALITY.maxDpr : 1.75;
-const dprFor = () => Math.min(window.devicePixelRatio || 1, MAX_DPR);
-const seg = (n) => Math.round(n * DETAIL);
-
-const section = document.querySelector('[data-finale]');
-const visual = section?.querySelector('[data-finale-visual]');
-const canvas = section?.querySelector('[data-finale-canvas]');
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const seg = (n) => n;
+let canvas;
+let visual;
 
 const circle = (r, n = 128) => new THREE.CatmullRomCurve3(
   Array.from({ length: n }, (_, i) => { const a = (i / n) * Math.PI * 2; return new THREE.Vector3(Math.cos(a) * r, Math.sin(a) * r, 0); }),
@@ -125,7 +115,7 @@ class FinaleScene {
     this.pointerTarget = new THREE.Vector2();
 
     this.resScale = 1;
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, preserveDrawingBuffer: true });
     this.renderer.setClearColor(0x000000, 1);
     this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
     this.scene = new THREE.Scene();
@@ -136,19 +126,18 @@ class FinaleScene {
     // Pós-processamento: multisampling só em computadores (o antialias nativo não se aplica ao composer)
     // Multisampling 4x também nos celulares (barato em GPUs móveis): borda do anel de vidro lisa.
     // Só quando o aparelho aceita multisampling em ponto flutuante; senão, segue sem (a cena funciona igual).
-    const msaaOk = this.renderer.capabilities.isWebGL2 && this.renderer.extensions.has('EXT_color_buffer_float');
-    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: msaaOk ? 4 : 0 });
+    const msaaOk = this.renderer.capabilities.isWebGL2;
+    const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: msaaOk ? 8 : 0 });
     this.composer = new EffectComposer(this.renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.bloom = new UnrealBloomPass(new THREE.Vector2(QUALITY.bloomRes, QUALITY.bloomRes), 0.85, 0.5, 0.38);
+    this.bloom = new UnrealBloomPass(new THREE.Vector2(512, 512), 0.85, 0.5, 0.38);
     // O bloom é um brilho difuso: calculado em resolução reduzida (o composer passaria o tamanho cheio da tela)
     const setBloomSize = this.bloom.setSize.bind(this.bloom);
-    const bloomMax = QUALITY.bloomRes * 2;
+    const bloomMax = 1024;
     this.bloom.setSize = (w, h) => { const k = Math.min(1, bloomMax / Math.max(w, h)); setBloomSize(Math.round(w * k), Math.round(h * k)); };
     this.composer.addPass(this.bloom);
 
-    new ResizeObserver(() => this.resize()).observe(visual);
-    this.resize();
+        this.resize();
   }
 
   glass(options) {
@@ -197,7 +186,7 @@ class FinaleScene {
   resize() {
     const { clientWidth: w, clientHeight: h } = visual;
     if (!w || !h) return;
-    const dpr = dprFor() * this.resScale;
+    const dpr = 1;
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(w, h, false);
     this.composer.setPixelRatio(dpr);
@@ -246,54 +235,20 @@ class FinaleScene {
   }
 
   render() { this.composer.render(); }
-
-  // Compila os shaders da cena em segundo plano e faz o primeiro quadro (passes do bloom) em momento
-  // ocioso: nada disso acontece no instante em que a dobra entra na tela.
-  async warmUp() {
-    await this.renderer.compileAsync(this.scene, this.camera);
-    await new Promise((resolve) => idle(resolve));
-    this.ready = true;
-    this.update(0);
-    this.render();
-  }
 }
 
-async function init() {
-  if (!section || !visual || !canvas || !webglAvailable()) return;
-  let scene;
-  try {
-    scene = new FinaleScene();
-    await scene.warmUp();
-    requestAnimationFrame(() => visual.classList.add('is-ready'));
-  } catch (error) {
-    console.warn('[final] WebGL indisponível; mantendo o fundo em CSS.', error);
-    return;
-  }
 
-  const measure = () => {
-    const vh = window.innerHeight;
-    const r = section.getBoundingClientRect();
-    // 0 quando a seção entra pela base; 1 quando está inteira na tela
-    scene.target = Math.min(1, Math.max(0, (vh - r.top) / vh));
+export function createFinaleScene(target, { scroll = 0.85 } = {}) {
+  canvas = target;
+  visual = { clientWidth: target.width, clientHeight: target.height };
+  const scene = new FinaleScene();
+  scene.ready = true;
+  scene.target = scene.p = scroll;
+  scene.resize();
+  let last = 0;
+  return (time) => {
+    scene.update(time - last);
+    last = time;
+    scene.render();
   };
-  measure();
-  scene.p = scene.target;
-
-  if (reducedMotion.matches) { scene.update(0); scene.render(); return; }
-
-  window.addEventListener('scroll', measure, { passive: true });
-  section.addEventListener('pointermove', (e) => {
-    scene.pointerTarget.set((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
-  }, { passive: true });
-
-  createLoop({
-    el: section,
-    // Se faltar fôlego, reduz no máximo até 70% (abaixo disso o portal voltaria a pixelar)
-    minScale: 0.7,
-    frame: (dt) => { scene.update(dt); scene.render(); },
-    onScale: (scale) => { scene.resScale = scale; scene.resize(); },
-  });
 }
-
-// A cena é preparada com antecedência (em momento ocioso) quando o visitante se aproxima do fim da página
-if (section) whenApproaching(section, init);
