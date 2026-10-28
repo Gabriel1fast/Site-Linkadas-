@@ -15,8 +15,8 @@ import numpy as np
 from PIL import Image
 
 src, loop_s, fps, out = Path(sys.argv[1]), float(sys.argv[2]), int(sys.argv[3]), sys.argv[4]
-crf_webm = sys.argv[5] if len(sys.argv) > 5 else '38'
-crf_mp4 = sys.argv[6] if len(sys.argv) > 6 else '26'
+crf_webm = sys.argv[5] if len(sys.argv) > 5 else '44'
+crf_mp4 = sys.argv[6] if len(sys.argv) > 6 else '30'
 
 frames = sorted(src.glob('f*.png'))
 loop_n = round(loop_s * fps)
