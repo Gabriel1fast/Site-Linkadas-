@@ -1,7 +1,7 @@
 /* 6ª dobra — fundo de lâminas de luz curvas (WebGL puro) que se movem com a rolagem,
    e cartões de solução que entram um de cada vez. Apenas cores oficiais do Design System. */
 
-import { deviceDpr, createLoop, whenNear } from './lib/perf.js';
+import { deviceDpr, createLoop, whenApproaching, compileProgram } from './lib/perf.js';
 
 const section = document.querySelector('[data-approach]');
 const canvas = section?.querySelector('[data-approach-canvas]');
@@ -104,23 +104,17 @@ const FRAGMENT = `
 `;
 
 class LightSheets {
-  constructor(canvas) {
-    this.canvas = canvas;
-    this.sticky = canvas.parentElement;
+  // O shader é compilado em segundo plano; a cena só existe quando ele estiver pronto
+  static async create(canvas) {
     const gl = canvas.getContext('webgl', { antialias: false, alpha: false, depth: false, powerPreference: 'low-power' });
     if (!gl) throw new Error('WebGL indisponível');
+    return new LightSheets(canvas, gl, await compileProgram(gl, VERTEX, FRAGMENT));
+  }
+
+  constructor(canvas, gl, prog) {
+    this.canvas = canvas;
+    this.sticky = canvas.parentElement;
     this.gl = gl;
-    const compile = (type, src) => {
-      const sh = gl.createShader(type);
-      gl.shaderSource(sh, src);
-      gl.compileShader(sh);
-      if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(sh));
-      return sh;
-    };
-    const prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERTEX));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAGMENT));
-    gl.linkProgram(prog);
     gl.useProgram(prog);
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -163,29 +157,36 @@ function init() {
 
   // Progresso dos cartões: vai de 0 (lista entrando) a 1 (lista perto do centro da tela)
   let target = 0;
+  let progress = '';
+  let pending = 0;
   function measure() {
+    pending = 0;
     const vh = window.innerHeight;
     const r = section.getBoundingClientRect();
     // Progresso da seção move as lâminas de luz (0 ao entrar pela base, 1 ao sair pelo topo)
     target = Math.min(1, Math.max(0, (vh - r.top) / (vh + r.height)));
     if (solutions) {
       const l = solutions.getBoundingClientRect();
-      section.style.setProperty('--c-progress', Math.min(1, Math.max(0, (vh * 0.95 - l.top) / (l.height + vh * 0.12))).toFixed(4));
+      // Só os cartões dependem do valor (e só é escrito quando muda): o resto da seção não recalcula estilo
+      const next = Math.min(1, Math.max(0, (vh * 0.95 - l.top) / (l.height + vh * 0.12))).toFixed(3);
+      if (next !== progress) solutions.style.setProperty('--c-progress', (progress = next));
     }
   }
+  // Uma medição por quadro, no máximo, durante a rolagem
+  const schedule = () => { if (!pending) pending = requestAnimationFrame(measure); };
 
   if (reducedMotion.matches) return; // cartões visíveis e fundo estático
 
-  window.addEventListener('scroll', measure, { passive: true });
-  window.addEventListener('resize', measure);
+  window.addEventListener('scroll', schedule, { passive: true });
+  window.addEventListener('resize', schedule);
   measure();
 
-  // O fundo WebGL só é criado quando a seção se aproxima da tela; luz lenta → 30 fps bastam
+  // O fundo WebGL é preparado com antecedência, em momento ocioso; luz lenta → 30 fps bastam
   if (!canvas) return;
-  whenNear(section, () => {
+  whenApproaching(section, async () => {
     let sheets;
     try {
-      sheets = new LightSheets(canvas);
+      sheets = await LightSheets.create(canvas);
       requestAnimationFrame(() => canvas.parentElement.classList.add('is-ready'));
     } catch (error) {
       console.warn('[abordagem] WebGL indisponível; mantendo o fundo em CSS.', error);

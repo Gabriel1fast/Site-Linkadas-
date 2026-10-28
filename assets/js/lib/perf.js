@@ -30,7 +30,7 @@ export function whenNear(el, init, margin = '600px') {
 
 /* Laço de animação com limite de fps e resolução adaptativa:
    se os quadros ficarem lentos, reduz a escala de pixels (até 50%); se sobrar folga, recupera. */
-export function createLoop({ el, frame, onScale, fps = QUALITY.fps }) {
+export function createLoop({ el, frame, onScale, fps = QUALITY.fps, minScale = 0.5 }) {
   let running = false;
   let raf = 0;
   let last = 0;
@@ -54,7 +54,7 @@ export function createLoop({ el, frame, onScale, fps = QUALITY.fps }) {
     // Governador: quadro acima do orçamento por vários ciclos → reduz; muito abaixo → recupera
     const budget = interval * 0.85;
     if (elapsed > interval * 1.6 || acc > budget) { slow++; fast = 0; } else if (elapsed < interval * 1.15) { fast++; slow = 0; }
-    if (slow > 12 && scale > 0.5) { scale = Math.max(0.5, scale - 0.15); slow = 0; onScale?.(scale); }
+    if (slow > 12 && scale > minScale) { scale = Math.max(minScale, scale - 0.15); slow = 0; onScale?.(scale); }
     if (fast > 240 && scale < 1) { scale = Math.min(1, scale + 0.1); fast = 0; onScale?.(scale); }
   }
 
@@ -69,4 +69,36 @@ export function createLoop({ el, frame, onScale, fps = QUALITY.fps }) {
   new IntersectionObserver(([entry]) => (entry.isIntersecting ? start() : stop())).observe(el);
   document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
   return { start, stop, get scale() { return scale; } };
+}
+
+/* Executa `fn` quando o navegador estiver ocioso (entre quadros, sem disputar com a rolagem) */
+export const idle = (fn, timeout = 1500) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout }) : setTimeout(fn, 200));
+
+/* Prepara a cena com bastante antecedência (a uma tela e meia de distância), em momento ocioso:
+   o custo de criação não cai no instante em que a seção entra na tela. */
+export function whenApproaching(el, init, margin = '150%') {
+  whenNear(el, () => idle(init), margin);
+}
+
+/* Compila um programa WebGL sem travar a página: com KHR_parallel_shader_compile o driver compila
+   em segundo plano e a promessa resolve quando estiver pronto (sem a extensão, resolve no quadro seguinte). */
+export function compileProgram(gl, vertex, fragment) {
+  const program = gl.createProgram();
+  const shaders = [[gl.VERTEX_SHADER, vertex], [gl.FRAGMENT_SHADER, fragment]].map(([type, source]) => {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    gl.attachShader(program, shader);
+    return shader;
+  });
+  gl.linkProgram(program);
+  const ext = gl.getExtension('KHR_parallel_shader_compile');
+  return new Promise((resolve, reject) => {
+    const check = () => {
+      if (ext && !gl.getProgramParameter(program, ext.COMPLETION_STATUS_KHR)) { requestAnimationFrame(check); return; }
+      if (gl.getProgramParameter(program, gl.LINK_STATUS)) { resolve(program); return; }
+      reject(new Error(shaders.map((s) => gl.getShaderInfoLog(s)).join('\n') || gl.getProgramInfoLog(program)));
+    };
+    requestAnimationFrame(check);
+  });
 }
