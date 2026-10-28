@@ -6,7 +6,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { readPalette, createRibbonGeometry, createGlassMaterial, webglAvailable } from './lib/glass.js';
-import { tier, QUALITY, deviceDpr, createLoop, whenNear } from './lib/perf.js';
+import { tier, QUALITY, deviceDpr, createLoop, whenApproaching, idle } from './lib/perf.js';
 
 const DETAIL = tier === 'high' ? 1 : 0.5;
 const seg = (n) => Math.round(n * DETAIL);
@@ -54,25 +54,27 @@ const gridMaterial = (palette) => new THREE.ShaderMaterial({
 });
 
 /* Anel desenhado por função de distância num plano: borda antisserrilhada em qualquer espessura
-   (substitui geometria fina demais, que ficava pontilhada). Um brilho percorre o anel. */
+   (substitui geometria fina demais, que ficava pontilhada). Um brilho percorre o anel.
+   Os parâmetros são uniforms: todos os anéis compartilham um único programa (uma só compilação). */
 const ringMaterial = (palette, { radius, width, intensity = 1, speed = 0.3, phase = 0 }) => new THREE.ShaderMaterial({
   uniforms: {
     uTime: { value: 0 }, uIntensity: { value: intensity },
+    uRadius: { value: radius }, uWidth: { value: width }, uSpeed: { value: speed }, uPhase: { value: phase },
     cViolet: { value: palette.violet }, cMagenta: { value: palette.magenta }, cOff: { value: palette.offwhite },
   },
   vertexShader: 'varying vec2 vP; void main() { vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
   fragmentShader: /* glsl */ `
-    uniform float uTime, uIntensity;
+    uniform float uTime, uIntensity, uRadius, uWidth, uSpeed, uPhase;
     uniform vec3 cViolet, cMagenta, cOff;
     varying vec2 vP;
     void main() {
       float r = length(vP);
-      float d = abs(r - ${radius.toFixed(3)});
+      float d = abs(r - uRadius);
       float fw = fwidth(r);
-      float core = 1.0 - smoothstep(${(width / 2).toFixed(4)}, ${(width / 2).toFixed(4)} + fw * 1.5, d);
-      float halo = exp(-d / (${width.toFixed(4)} * 2.0 + fw * 1.5)) * 0.22;
+      float core = 1.0 - smoothstep(uWidth * 0.5, uWidth * 0.5 + fw * 1.5, d);
+      float halo = exp(-d / (uWidth * 2.0 + fw * 1.5)) * 0.22;
       float a = atan(vP.y, vP.x);
-      float sweep = pow(0.5 + 0.5 * cos(a - uTime * ${speed.toFixed(3)} - ${phase.toFixed(3)}), 6.0);
+      float sweep = pow(0.5 + 0.5 * cos(a - uTime * uSpeed - uPhase), 6.0);
       vec3 col = mix(cViolet, cMagenta, 0.35 + 0.65 * sweep) * (core * 0.9 + halo) + cOff * core * sweep * 0.5;
       gl_FragColor = vec4(col * uIntensity, 1.0);
     }
@@ -128,6 +130,10 @@ class FinaleScene {
     this.composer = new EffectComposer(this.renderer, target);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
     this.bloom = new UnrealBloomPass(new THREE.Vector2(QUALITY.bloomRes, QUALITY.bloomRes), 0.85, 0.5, 0.38);
+    // O bloom é um brilho difuso: calculado em resolução reduzida (o composer passaria o tamanho cheio da tela)
+    const setBloomSize = this.bloom.setSize.bind(this.bloom);
+    const bloomMax = QUALITY.bloomRes * 2;
+    this.bloom.setSize = (w, h) => { const k = Math.min(1, bloomMax / Math.max(w, h)); setBloomSize(Math.round(w * k), Math.round(h * k)); };
     this.composer.addPass(this.bloom);
 
     new ResizeObserver(() => this.resize()).observe(visual);
@@ -190,7 +196,7 @@ class FinaleScene {
     this.distanceFactor = THREE.MathUtils.clamp(1.25 / this.camera.aspect, 1, 2.2);
     this.camera.updateProjectionMatrix();
     this.update(0);
-    this.render();
+    if (this.ready) this.render();
   }
 
   update(dt) {
@@ -227,13 +233,24 @@ class FinaleScene {
   }
 
   render() { this.composer.render(); }
+
+  // Compila os shaders da cena em segundo plano e faz o primeiro quadro (passes do bloom) em momento
+  // ocioso: nada disso acontece no instante em que a dobra entra na tela.
+  async warmUp() {
+    await this.renderer.compileAsync(this.scene, this.camera);
+    await new Promise((resolve) => idle(resolve));
+    this.ready = true;
+    this.update(0);
+    this.render();
+  }
 }
 
-function init() {
+async function init() {
   if (!section || !visual || !canvas || !webglAvailable()) return;
   let scene;
   try {
     scene = new FinaleScene();
+    await scene.warmUp();
     requestAnimationFrame(() => visual.classList.add('is-ready'));
   } catch (error) {
     console.warn('[final] WebGL indisponível; mantendo o fundo em CSS.', error);
@@ -263,5 +280,5 @@ function init() {
   });
 }
 
-// A cena só é criada quando o visitante se aproxima do fim da página
-if (section) whenNear(section, init);
+// A cena é preparada com antecedência (em momento ocioso) quando o visitante se aproxima do fim da página
+if (section) whenApproaching(section, init);
